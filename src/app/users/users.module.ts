@@ -7,6 +7,7 @@ import { ApiUsersComponent } from './api-users/api-users.component';
 import { LocalUsersComponent } from './local-users/local-users.component';
 
 // Material
+import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
 import { ApiUserService } from './shared/api-user.service';
@@ -14,7 +15,8 @@ import { ApiUserService } from './shared/api-user.service';
 @NgModule({
   imports: [
     CommonModule,
-    MatTabsModule
+    MatTabsModule,
+    MatListModule
   ],
   declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent],
   exports: [UsersComponent],

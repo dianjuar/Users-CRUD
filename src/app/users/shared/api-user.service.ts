@@ -47,10 +47,14 @@ export class ApiUserService {
         list.push(user);
         return list;
       }, new Array<ApiUser>())
-      // Assign the user list to our list
-      .do((userList: Array<ApiUser>) => this.users = userList)
       // TODO error handling cases
-      .subscribe();
+      // Assign the user list to our list
+      .subscribe(
+        (userList: Array<ApiUser>) => {
+          this.users.push(...userList);
+          // console.log(this.users);
+        }
+      );
   }
 
 }
