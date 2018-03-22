@@ -6,6 +6,8 @@ import { UsersComponent } from './users.component';
 import { ApiUsersComponent } from './api-users/api-users.component';
 import { LocalUsersComponent } from './local-users/local-users.component';
 
+import { LoadingModule } from 'ngx-loading';
+
 // Material
 import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -16,6 +18,9 @@ import { ApiUserService } from './shared/api-user.service';
 @NgModule({
   imports: [
     CommonModule,
+    LoadingModule,
+
+    // Material
     MatListModule,
     MatTabsModule,
     MatPaginatorModule

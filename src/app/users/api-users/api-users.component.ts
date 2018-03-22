@@ -16,7 +16,17 @@ export class ApiUsersComponent implements OnInit {
    */
   users: Array<ApiUser>;
 
+  /**
+   * To indicate if the component is loading
+   */
+  loading;
+
   constructor(public apiUsers: ApiUserService) {
+    // We are loading
+    this.loading = true;
+
+    this.apiUsers.isLoading()
+      .subscribe(() => this.loading = false);
   }
 
   ngOnInit() {
@@ -29,8 +39,11 @@ export class ApiUsersComponent implements OnInit {
    * @param page The information about the current page
    */
   pageChanged(page: PageEvent) {
+    this.loading = true;
+
     // Fetch the users for the page that we are viewing
-    this.apiUsers.pageChange(page.pageIndex + 1);
+    this.apiUsers.pageChange(page.pageIndex + 1)
+      .subscribe(() => this.loading = false);
   }
 
 }

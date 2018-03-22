@@ -3,10 +3,12 @@ import { ApiUser } from './api-user.model';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/reduce';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/switchMap';
 
 
 @Injectable()
@@ -28,7 +30,12 @@ export class ApiUserService implements Pagination {
   /**
    * The endpoint to get the users
    */
-  readonly getUsersEndPoint = 'https://reqres.in/api/users';
+  private readonly getUsersEndPoint = 'https://reqres.in/api/users';
+
+  /**
+   * To indicate when we are loading
+   */
+  private loading: BehaviorSubject<boolean>;
 
   constructor(private http: HttpClient) {
     this.users = new Array<ApiUser>();
@@ -46,6 +53,9 @@ export class ApiUserService implements Pagination {
    * Fetch the users from the API
    */
   getUsers() {
+    // Instantiate the loading object and indicate that we are loading
+    this.loading = new BehaviorSubject<boolean>(true);
+
     this.http.get(this.getUsersEndPoint + '?page=' + this.page)
       // Assign pagination properties
       .do((resp: any) => {
@@ -72,6 +82,11 @@ export class ApiUserService implements Pagination {
           this.users.splice(0, this.users.length);
           // Push the new ones
           this.users.push(...userList);
+
+          // Indicate that we are not longer loading
+          this.loading.next(false);
+          // Close the subject
+          this.loading.complete();
           // console.log(this.users);
         }
       );
@@ -79,12 +94,28 @@ export class ApiUserService implements Pagination {
 
   /**
    * Get the users by page
+   *
    * @param index Index to fetch
+   * @returns {Observable<boolean>} To subscribe and know it loads
    */
-  pageChange(index: number) {
+  pageChange(index: number): Observable<boolean> {
     this.page = index;
 
     this.getUsers();
+
+    return this.isLoading();
+  }
+
+  /**
+   * Observable to indicate that we are loading or fetching users.
+   * This will emit something only when finish to load
+   *
+   * @returns {Observable<boolean>} To subscribe and know it loads
+   */
+  isLoading(): Observable<boolean> {
+    return this.loading.asObservable()
+      // Emit something only when it loads
+      .filter((res: boolean) => res === false);
   }
 
 }
