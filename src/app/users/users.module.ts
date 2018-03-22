@@ -9,6 +9,8 @@ import { LocalUsersComponent } from './local-users/local-users.component';
 import { LoadingModule } from 'ngx-loading';
 
 // Material
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -21,9 +23,11 @@ import { ApiUserService } from './shared/api-user.service';
     LoadingModule,
 
     // Material
+    MatButtonModule,
+    MatIconModule,
     MatListModule,
+    MatPaginatorModule,
     MatTabsModule,
-    MatPaginatorModule
   ],
   declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent],
   exports: [UsersComponent],
