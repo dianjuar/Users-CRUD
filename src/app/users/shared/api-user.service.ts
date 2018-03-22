@@ -10,12 +10,20 @@ import 'rxjs/add/operator/do';
 
 
 @Injectable()
-export class ApiUserService {
+export class ApiUserService implements Pagination {
 
   /**
    * The API users list
    */
   users: Array<ApiUser>;
+
+  /**
+   * Pagination information
+   */
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
 
   /**
    * The endpoint to get the users
@@ -24,6 +32,9 @@ export class ApiUserService {
 
   constructor(private http: HttpClient) {
     this.users = new Array<ApiUser>();
+
+    // Get always the 1st page
+    this.page = 1;
 
     /**
      * Get the users
@@ -35,7 +46,13 @@ export class ApiUserService {
    * Fetch the users from the API
    */
   getUsers() {
-    this.http.get(this.getUsersEndPoint)
+    this.http.get(this.getUsersEndPoint + '?page=' + this.page)
+      // Assign pagination properties
+      .do((resp: any) => {
+        this.perPage = resp.per_page;
+        this.total = resp.total;
+        this.totalPages = resp.total_pages;
+      })
       // Return only the data
       .map((resp: any) => resp.data)
       // Return only one user
@@ -51,10 +68,48 @@ export class ApiUserService {
       // Assign the user list to our list
       .subscribe(
         (userList: Array<ApiUser>) => {
+          // Quit all the users
+          this.users.splice(0, this.users.length);
+          // Push the new ones
           this.users.push(...userList);
           // console.log(this.users);
         }
       );
   }
 
+  /**
+   * Get the users by page
+   * @param index Index to fetch
+   */
+  pageChange(index: number) {
+    this.page = index;
+
+    this.getUsers();
+  }
+
+}
+
+/**
+ * Interface to store all the pagination information
+ */
+interface Pagination {
+  /**
+   * The current viewed page
+   */
+  page: number;
+
+  /**
+   * How many items per page
+   */
+  perPage: number;
+
+  /**
+   * Total items
+   */
+  total: number;
+
+  /**
+   * How many pages are
+   */
+  totalPages: number;
 }
