@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { ApiUserService } from '../shared/api-user.service';
+
 @Component({
   selector: 'app-api-users',
   templateUrl: './api-users.component.html',
@@ -7,7 +9,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ApiUsersComponent implements OnInit {
 
-  constructor() { }
+  constructor(private apiUsers: ApiUserService) {
+  }
 
   ngOnInit() {
   }
