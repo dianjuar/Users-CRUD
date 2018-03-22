@@ -1,0 +1,42 @@
+<h1 mat-dialog-title>Create an User</h1>
+
+<!-- content -->
+<div mat-dialog-content>
+  <small class="md-warn mat-caption message">The fields with * are required</small>
+
+  <form class="user-fields">
+
+    <mat-form-field>
+      <input matInput type="text" placeholder="First Name" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="text" placeholder="Second Name" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="email" placeholder="Email" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="tel" placeholder="Phone Number" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput
+        [(ngModel)]="birthDate" name="birthDate"
+        [matDatepicker]="picker"
+        [max]="maxDate"
+        (dateChange)="birthDateChanged()"
+        type="text" placeholder="Birth Date" readonly required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker disabled="false" startView="year" [startAt]="startDate"></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="age" type="text" placeholder="Age" name="age" readonly>
+    </mat-form-field>
+
+  </form>
+</div>
+
+<!-- Actions -->
+<div mat-dialog-actions>
+  <button mat-button (click)="closeModal()">Cancel</button>
+  <button mat-button cdkFocusInitial color="primary">Create</button>
+</div>
