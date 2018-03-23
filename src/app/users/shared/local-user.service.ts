@@ -89,7 +89,9 @@ export class LocalUserService extends LoadingService {
         localUser.lastName,
         localUser.email,
         localUser.phone,
-        localUser.birthDate))
+        localUser.birthDate,
+        localUser.id
+      ))
       // Collect all the users in an array
       .reduce((localUsers: Array<LocalUser>, user: LocalUser) => {
         localUsers.push(user);

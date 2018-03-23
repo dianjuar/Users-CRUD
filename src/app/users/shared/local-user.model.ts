@@ -1,7 +1,14 @@
+import * as shortid from 'shortid';
+
 /**
  *  Model of the local user
  */
 export class LocalUser {
+
+  /**
+   * A unique identifier
+   */
+  id: string;
 
   /**
    * First name of the user
@@ -39,7 +46,11 @@ export class LocalUser {
     email: string,
     phone: string,
     birthDate: Date | string,
+    id?: string
   ) {
+    // Set the ID or generate a new one
+    this.id = id || shortid.generate();
+
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
