@@ -37,7 +37,8 @@
       <input
         matInput
         [(ngModel)]="user.phone" name="phone"
-        type="tel" placeholder="Phone Number" required>
+        pattern = "^\d{9,15}$"
+        type="text" placeholder="Phone Number" required>
     </mat-form-field>
 
     <!-- birth date -->
