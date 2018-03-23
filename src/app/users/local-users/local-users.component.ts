@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { MatTableDataSource, MatTable, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatTable, MatDialog, MatSnackBar } from '@angular/material';
 
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
 
@@ -49,6 +49,7 @@ export class LocalUsersComponent implements OnInit {
 
   constructor(
     private localUserService: LocalUserService,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {
     // We are loading
@@ -84,18 +85,40 @@ export class LocalUsersComponent implements OnInit {
   }
 
   updateRows() {
+    console.log(this.users);
     this.table.renderRows();
   }
 
+  /**
+   *
+   * @param user
+   */
   deleteUser(user: LocalUser) {
+    // Open the confirmation dialog
     const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
       data: user
     });
 
+    // When the dialog is closed it receive the user response
     dialogRef.afterClosed().subscribe((userToDelete: LocalUser) => {
       // If when closing we receive a userID means the the users accepts
       if (userToDelete) {
-        this.localUserService.deleteUser(userToDelete);
+        // Indicate that we are loading
+        this.loading = true;
+
+        // Delete user
+        this.localUserService.deleteUser(userToDelete)
+          // On success update table and display a notification
+          .subscribe(
+            () => {
+              this.loading = false;
+              this.updateRows();
+              // Show a snack bar to indicate the operation
+              this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
+                duration: 2000,
+              });
+            }
+          );
       }
     });
   }

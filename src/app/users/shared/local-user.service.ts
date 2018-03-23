@@ -26,7 +26,7 @@ export class LocalUserService extends LoadingService {
   /**
    * The endpoint to "save" the users
    */
-  private readonly saveUsersEndPoint = 'https://reqres.in/api/users';
+  private readonly usersEndpoint = 'https://reqres.in/api/users/';
 
   constructor(
     private http: HttpClient,
@@ -58,9 +58,24 @@ export class LocalUserService extends LoadingService {
       return Observable.throw('the email already exits');
     }
 
-    this.http.post(this.saveUsersEndPoint, { })
+    this.http.post(this.usersEndpoint, { })
       // Save the user on local storage
       .switchMap(() => this.saveUserOnLocalStorage(user))
+      .subscribe(
+        () => {
+          this.loadingDone();
+        }
+      );
+
+    return this.isLoading();
+  }
+
+  deleteUser(userToDelete: LocalUser) {
+    this.imLoading();
+
+    this.http.put(`${this.usersEndpoint}${userToDelete.id}`, {})
+      // Remove the user on local storage
+      .switchMap(() => this.removeUserOnLocalStorage(userToDelete))
       .subscribe(
         () => {
           this.loadingDone();
@@ -137,6 +152,27 @@ export class LocalUserService extends LoadingService {
     return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers)))
       // If everything goes well assign the new user to the localUser array
       .do(() => this.users.push(userToSave));
+  }
+
+  /**
+   * Delete an user form the DB
+   * TODO Verify that the user exits
+   *
+   * @param userToDelete User to be deleted
+   */
+  private removeUserOnLocalStorage(userToDelete: LocalUser): Observable<any> {
+    // Make a clone of the users and remove the user
+    const localUsers = this.users.filter((user: LocalUser) => user.id !== userToDelete.id);
+
+    // Save the array with the user removed on local storage
+    return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers)))
+      // If everything goes well assign the array of users with the user removed to the original array
+      .do(() => {
+        // Quit all the users
+        this.users.splice(0, this.users.length);
+        // Push the new ones
+        this.users.push(...localUsers);
+      });
   }
 
 }
