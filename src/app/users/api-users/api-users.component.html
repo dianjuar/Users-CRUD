@@ -1,3 +1,16 @@
-<p>
-  api-users works!
-</p>
+<ngx-loading [show]="loading"></ngx-loading>
+
+<div class="wrapper">
+  <mat-list>
+    <mat-list-item *ngFor="let user of users">
+      <img matListAvatar src="{{user.avatar}}" alt="User Picture">
+      <h3 matLine> {{user.firstName}} </h3>
+      <p matLine>
+        <span> {{user.lastName}} </span>
+      </p>
+    </mat-list-item>
+  </mat-list>
+
+  <mat-paginator [length]="apiUsers.total" [pageSize]="apiUsers.perPage" (page)="pageChanged($event)">
+  </mat-paginator>
+</div>

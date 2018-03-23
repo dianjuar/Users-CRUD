@@ -3,6 +3,10 @@
     <app-api-users></app-api-users>
   </mat-tab>
   <mat-tab label="Local Users">
-    <app-local-users></app-local-users>
+    <app-local-users #localUsers></app-local-users>
   </mat-tab>
 </mat-tab-group>
+
+<button mat-fab (click)="openDialogCreateLocalUser()">
+  <mat-icon aria-label="Add a new person">person_add</mat-icon>
+</button>
