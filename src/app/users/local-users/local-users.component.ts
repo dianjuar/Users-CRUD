@@ -38,12 +38,13 @@ export class LocalUsersComponent implements OnInit {
    * The columns of the table
    */
   readonly displayedColumns = [
-    'firstName',
-    'lastName',
+    'fullName',
     'email',
     'phone',
     'birthDate',
     'age',
+    'createdAt',
+    'updatedAt',
     'actions',
   ];
 

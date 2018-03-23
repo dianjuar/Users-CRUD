@@ -60,7 +60,14 @@ export class LocalUserService extends LoadingService {
 
     this.http.post(this.usersEndpoint, { })
       // Save the user on local storage
-      .switchMap(() => this.saveUserOnLocalStorage(user))
+      .switchMap((resp: any) => {
+        user.id = resp.id;
+        user.setCreatedAt(resp.createdAt);
+        // first time user creation the updated at will be same as created at date
+        user.setUpdatedAt(resp.createdAt);
+
+        return this.saveUserOnLocalStorage(user);
+      })
       .subscribe(
         () => {
           this.loadingDone();
@@ -70,7 +77,15 @@ export class LocalUserService extends LoadingService {
     return this.isLoading();
   }
 
-  deleteUser(userToDelete: LocalUser) {
+  /**
+   * Delete a user from local storage
+   *
+   * @param userToDelete User to Delete
+   * @returns {Observable<boolean>}
+   *          To subscribe and know it finish. In case the email already exits
+   *          will throw an observable error
+   */
+  deleteUser(userToDelete: LocalUser): Observable<boolean> {
     this.imLoading();
 
     this.http.put(`${this.usersEndpoint}${userToDelete.id}`, {})
@@ -105,7 +120,9 @@ export class LocalUserService extends LoadingService {
         localUser.email,
         localUser.phone,
         localUser.birthDate,
-        localUser.id
+        localUser.id,
+        localUser.createdAt,
+        localUser.updatedAt
       ))
       // Collect all the users in an array
       .reduce((localUsers: Array<LocalUser>, user: LocalUser) => {
