@@ -39,11 +39,18 @@ export class CreateUserComponent implements OnInit {
    */
   user: LocalUser;
 
+  /**
+   * To indicate if the component is loading
+   */
+  loading;
+
   constructor(
     public dialogRef: MatDialogRef<CreateUserComponent>,
     private snackBar: MatSnackBar,
     private localUserService: LocalUserService
   ) {
+    // We are loading
+    this.loading = false;
 
     // Set the start dates
     this.startDate = new Date();
@@ -76,6 +83,9 @@ export class CreateUserComponent implements OnInit {
    * after that show a message
    */
   onSubmit() {
+    // Indicate that we are loading
+    this.loading = true;
+
     this.localUserService.saveUser(this.user)
       // Close the modal on success
       .switchMap(() => this.closeModal())
@@ -88,6 +98,13 @@ export class CreateUserComponent implements OnInit {
           });
         }
       );
+
+    // Subscribe to know when the process finish
+    this.localUserService.isLoading()
+      .subscribe(
+        () => {
+          this.loading = false;
+        });
   }
 
   /**

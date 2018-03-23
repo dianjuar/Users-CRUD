@@ -2,6 +2,8 @@
 
 <!-- content -->
 <div mat-dialog-content>
+  <ngx-loading [show]="loading"></ngx-loading>
+
   <small class="md-warn mat-caption message">The fields with * are required</small>
 
   <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="user-fields">
