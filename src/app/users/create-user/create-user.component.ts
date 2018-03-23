@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatDatepickerInputEvent } from '@angular/material';
+import { NgForm } from '@angular/forms';
+
+import { LocalUser } from '../shared/local-user.model';
+
 
 @Component({
   selector: 'app-create-user',
@@ -9,6 +13,11 @@ import { MatDatepickerInputEvent } from '@angular/material';
   styleUrls: ['./create-user.component.scss']
 })
 export class CreateUserComponent implements OnInit {
+  /**
+   * Reference to the form
+   */
+  @ViewChild('userForm') userForm: NgForm;
+
   /**
    * The start date of the date picker
    * UX improvident, the user will be more near to its birth date
@@ -22,10 +31,9 @@ export class CreateUserComponent implements OnInit {
   maxDate: Date;
 
   /**
-   * User Data
+   * Representation of the user
    */
-  age: string | number;
-  birthDate: Date;
+  user: LocalUser;
 
   constructor(
     public dialogRef: MatDialogRef<CreateUserComponent>) {
@@ -39,23 +47,10 @@ export class CreateUserComponent implements OnInit {
     // Rest 2 years to today, a two years baby can use this ;)
     this.maxDate.setFullYear(this.maxDate.getFullYear() - 2);
 
-    this.age = '';
+    this.user = LocalUser.initEmptyUser();
   }
 
   ngOnInit() {
-  }
-
-  /**
-   * The birth date was change so calculate the age
-   */
-  birthDateChanged() {
-    // Time difference
-    const timeDiff = Math.abs(new Date().getTime() - this.birthDate.getTime());
-    // Days difference
-    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-    // Calculate the age
-    this.age = Math.trunc(diffDays / 365);
   }
 
   /**
@@ -63,6 +58,15 @@ export class CreateUserComponent implements OnInit {
    */
   closeModal() {
     this.dialogRef.close();
+  }
+
+  onSubmit() {
+    console.log('SUBMIT');
+  }
+
+  submitForm() {
+    // console.log(this.userForm);
+    // this.userForm.ngSubmit.next();
   }
 
 }
