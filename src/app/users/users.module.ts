@@ -12,6 +12,7 @@ import { UsersComponent } from './users.component';
 import { ApiUserService } from './shared/api-user.service';
 // Modules
 import { LoadingModule } from 'ngx-loading';
+import { NgxLocalStorageModule } from 'ngx-localstorage';
 
 // Material
 import { MatNativeDateModule } from '@angular/material';
@@ -32,6 +33,9 @@ import { LocalUserService } from './shared/local-user.service';
   imports: [
     CommonModule,
     FormsModule,
+    NgxLocalStorageModule.forRoot({
+      prefix: 'users'
+    }),
     LoadingModule,
 
     // Material
