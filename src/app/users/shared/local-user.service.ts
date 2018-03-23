@@ -11,8 +11,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/reduce';
 import 'rxjs/add/operator/switchMap';
 
+import { LoadingService } from '../../shared/loading-service';
+
 @Injectable()
-export class LocalUserService {
+export class LocalUserService extends LoadingService {
 
   /**
    * The endpoint to "save" the users
@@ -22,18 +24,28 @@ export class LocalUserService {
   constructor(
     private http: HttpClient
   ) {
-
+    super();
   }
 
   /**
-   * Save user
+   * Save user and return an observable to know when we finish the operation
    *
    * @param user The user to save
+   * @returns {Observable<boolean>} To subscribe and know it finish
    */
-  saveUser(user: LocalUser) {
+  saveUser(user: LocalUser): Observable<boolean> {
+    this.imLoading();
+
     this.http.post(this.saveUsersEndPoint, { })
       .do(() => console.log('saved'))
-      .subscribe();
+      .subscribe(
+        () => {
+
+          this.loadingDone();
+        }
+      );
+
+      return this.isLoading();
   }
 
 }
