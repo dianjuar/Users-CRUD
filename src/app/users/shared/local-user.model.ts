@@ -93,6 +93,15 @@ export class LocalUser {
   }
 
   /**
+   * Get the full name of the user
+   * @returns {string} The full name of the user
+   * @example "Diego Juliao"
+   */
+  getFullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+
+  /**
    * Calculate the age an put it to the attribute
    */
   setAge() {
