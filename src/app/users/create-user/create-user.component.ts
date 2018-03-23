@@ -1,16 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
-import { MatDialogRef } from '@angular/material/dialog';
-import { MatDatepickerInputEvent } from '@angular/material';
 import { NgForm } from '@angular/forms';
 
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatDatepickerInputEvent, MatSnackBar } from '@angular/material';
+
 import { LocalUser } from '../shared/local-user.model';
+import { LocalUserService } from '../shared/local-user.service';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/switchMap';
 
 
 @Component({
   selector: 'app-create-user',
   templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss']
+  styleUrls: ['./create-user.component.scss'],
 })
 export class CreateUserComponent implements OnInit {
   /**
@@ -35,8 +39,18 @@ export class CreateUserComponent implements OnInit {
    */
   user: LocalUser;
 
+  /**
+   * To indicate if the component is loading
+   */
+  loading;
+
   constructor(
-    public dialogRef: MatDialogRef<CreateUserComponent>) {
+    public dialogRef: MatDialogRef<CreateUserComponent>,
+    private snackBar: MatSnackBar,
+    private localUserService: LocalUserService
+  ) {
+    // We are loading
+    this.loading = false;
 
     // Set the start dates
     this.startDate = new Date();
@@ -55,18 +69,52 @@ export class CreateUserComponent implements OnInit {
 
   /**
    * Just close the modal because the user doesn't want to do anything
+   *
+   * @returns {Observable<any>} An observable to subscribe an know when the dialog is closed
    */
-  closeModal() {
+  closeModal(): Observable<any> {
     this.dialogRef.close();
+
+    return this.dialogRef.afterClosed();
   }
 
+  /**
+   * Catch the event of the form submit and go to save the user
+   * after that show a message
+   */
   onSubmit() {
-    console.log('SUBMIT');
+    // Indicate that we are loading
+    this.loading = true;
+
+    this.localUserService.saveUser(this.user)
+      // Close the modal on success
+      .switchMap(() => this.closeModal())
+      // When the modal is closed....
+      .subscribe(
+        // next
+        () => {
+          // Show a snack bar to indicate the operation
+          this.snackBar.open('User Saved Successfully', 'GOT IT!', {
+            duration: 2000,
+          });
+        },
+        // error
+        (err: string) => {
+          console.log('error', err);
+          this.loading = false;
+        },
+        // complete
+        () => {
+          this.loading = false;
+        }
+      );
   }
 
+  /**
+   * Trigger the submit of the new user form
+   */
   submitForm() {
     // console.log(this.userForm);
-    // this.userForm.ngSubmit.next();
+    this.userForm.ngSubmit.next();
   }
-
 }

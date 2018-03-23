@@ -12,6 +12,7 @@ import { UsersComponent } from './users.component';
 import { ApiUserService } from './shared/api-user.service';
 // Modules
 import { LoadingModule } from 'ngx-loading';
+import { NgxLocalStorageModule } from 'ngx-localstorage';
 
 // Material
 import { MatNativeDateModule } from '@angular/material';
@@ -23,13 +24,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { LocalUserService } from './shared/local-user.service';
 
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    NgxLocalStorageModule.forRoot({
+      prefix: 'users'
+    }),
     LoadingModule,
 
     // Material
@@ -42,11 +48,12 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatNativeDateModule,
     MatListModule,
     MatPaginatorModule,
+    MatSnackBarModule,
     MatTabsModule,
   ],
   declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent],
   exports: [UsersComponent],
-  providers: [ApiUserService],
+  providers: [ApiUserService, LocalUserService],
   entryComponents: [
     CreateUserComponent
   ]

@@ -27,13 +27,13 @@
     "@ngtools/json-schema" "^1.1.0"
     rxjs "^5.5.6"
 
-"@angular/animations@^5.2.9":
+"@angular/animations@^5.2.0", "@angular/animations@^5.2.9":
   version "5.2.9"
   resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-5.2.9.tgz#220db9fb5a52a193db0023d721b23ddd25a75770"
   dependencies:
     tslib "^1.7.1"
 
-"@angular/cdk@^5.2.4":
+"@angular/cdk@^5.2.2", "@angular/cdk@^5.2.4":
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-5.2.4.tgz#c0a429a8710d8fedb157f546e21cb49d4335f7f7"
   dependencies:
@@ -147,7 +147,7 @@
   version "5.2.9"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-5.2.9.tgz#4838bb6319c99e8f5beb08bdfb392ee9a1173766"
 
-"@angular/material@^5.2.4":
+"@angular/material@^5.2.2", "@angular/material@^5.2.4":
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-5.2.4.tgz#9e823798324283d23ea839156fac5bcb73443d55"
   dependencies:
@@ -4298,6 +4298,25 @@ next-tick@1:
 ngx-loading@^1.0.14:
   version "1.0.14"
   resolved "https://registry.yarnpkg.com/ngx-loading/-/ngx-loading-1.0.14.tgz#19758c33ea3fa9bb96dca1f40ca19d4d86b8042c"
+
+ngx-localstorage@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ngx-localstorage/-/ngx-localstorage-2.0.1.tgz#b1ff0dc6da699974dd3e61b8bd87fb72a218d403"
+  dependencies:
+    "@angular/animations" "^5.2.0"
+    "@angular/cdk" "^5.2.2"
+    "@angular/common" "^5.2.0"
+    "@angular/compiler" "^5.2.0"
+    "@angular/core" "^5.2.0"
+    "@angular/forms" "^5.2.0"
+    "@angular/http" "^5.2.0"
+    "@angular/material" "^5.2.2"
+    "@angular/platform-browser" "^5.2.0"
+    "@angular/platform-browser-dynamic" "^5.2.0"
+    "@angular/router" "^5.2.0"
+    core-js "^2.4.1"
+    rxjs "^5.5.6"
+    zone.js "^0.8.19"
 
 no-case@^2.2.0:
   version "2.3.2"
