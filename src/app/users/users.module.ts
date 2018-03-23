@@ -10,6 +10,8 @@ import { UsersComponent } from './users.component';
 
 // Services
 import { ApiUserService } from './shared/api-user.service';
+import { LocalUserService } from './shared/local-user.service';
+
 // Modules
 import { LoadingModule } from 'ngx-loading';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
@@ -26,7 +28,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
-import { LocalUserService } from './shared/local-user.service';
+import { MatTableModule } from '@angular/material/table';
 
 
 @NgModule({
@@ -50,6 +52,7 @@ import { LocalUserService } from './shared/local-user.service';
     MatPaginatorModule,
     MatSnackBarModule,
     MatTabsModule,
+    MatTableModule
   ],
   declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent],
   exports: [UsersComponent],
