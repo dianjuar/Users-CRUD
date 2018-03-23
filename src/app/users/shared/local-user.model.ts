@@ -38,13 +38,19 @@ export class LocalUser {
     lastName: string,
     email: string,
     phone: string,
-    birthDate: Date,
+    birthDate: Date | string,
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.phone = phone;
-    this.birthDate = birthDate;
+
+    // If the date is an string transform it to a Date
+    if (typeof birthDate === 'string') {
+      this.birthDate = new Date(birthDate);
+    } else {
+      this.birthDate = birthDate;
+    }
 
     // Calculate the age
     this.setAge();

@@ -36,6 +36,9 @@ export class LocalUserService extends LoadingService {
 
     // Init the local users
     this.users = new Array<LocalUser>();
+
+    // Load the users from local storage
+    this.loadLocalUsers();
   }
 
   /**
@@ -65,6 +68,40 @@ export class LocalUserService extends LoadingService {
       );
 
     return this.isLoading();
+  }
+
+  /**
+   * Load the users form the local storage and assign them to
+   * our array of users
+   */
+  private loadLocalUsers() {
+    this.imLoading();
+
+    // Load the stored users
+    Observable.fromPromise(this.localStorageService.asPromisable().get('users'))
+      // Parse the stored array to a json
+      .map((usersOnLocalStorage: string) => JSON.parse(usersOnLocalStorage))
+      // Return only one user
+      .switchMap((localUsers: Array<any>) => localUsers)
+      // Transform the user from simple json to our model
+      .map((localUser: any) => new LocalUser(
+        localUser.firstName,
+        localUser.lastName,
+        localUser.email,
+        localUser.phone,
+        localUser.birthDate))
+      // Collect all the users in an array
+      .reduce((localUsers: Array<LocalUser>, user: LocalUser) => {
+        localUsers.push(user);
+        return localUsers;
+      }, new Array<LocalUser>())
+      // Assign the user list to our list
+      .subscribe(
+        (localUsers: Array<LocalUser>) => {
+          this.users.push(...localUsers);
+          this.loadingDone();
+        }
+      );
   }
 
   /**
