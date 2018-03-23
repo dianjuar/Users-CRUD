@@ -24,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
+import { LocalUserService } from './shared/local-user.service';
 
 
 @NgModule({
@@ -46,7 +47,7 @@ import { MatTabsModule } from '@angular/material/tabs';
   ],
   declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent],
   exports: [UsersComponent],
-  providers: [ApiUserService],
+  providers: [ApiUserService, LocalUserService],
   entryComponents: [
     CreateUserComponent
   ]

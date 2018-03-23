@@ -5,6 +5,7 @@ import { MatDatepickerInputEvent } from '@angular/material';
 import { NgForm } from '@angular/forms';
 
 import { LocalUser } from '../shared/local-user.model';
+import { LocalUserService } from '../shared/local-user.service';
 
 
 @Component({
@@ -36,7 +37,9 @@ export class CreateUserComponent implements OnInit {
   user: LocalUser;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateUserComponent>) {
+    public dialogRef: MatDialogRef<CreateUserComponent>,
+    private localUserService: LocalUserService
+  ) {
 
     // Set the start dates
     this.startDate = new Date();
@@ -60,13 +63,19 @@ export class CreateUserComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  /**
+   * Catch the event of the form submit
+   */
   onSubmit() {
-    console.log('SUBMIT');
+    this.localUserService.saveUser(this.user);
   }
 
+  /**
+   * Trigger the submit of the new user form
+   */
   submitForm() {
     // console.log(this.userForm);
-    // this.userForm.ngSubmit.next();
+    this.userForm.ngSubmit.next();
   }
 
 }
