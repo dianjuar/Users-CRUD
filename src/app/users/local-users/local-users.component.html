@@ -2,9 +2,12 @@
 
 <div class="mat-elevation-z8">
 
-  <mat-form-field>
-    <input matInput (keyup)="emailCriteriaChanged($event.target.value)" placeholder="Filter by email">
-  </mat-form-field>
+  <div class="filters">
+    <mat-form-field>
+      <input matInput (keyup)="emailCriteriaChanged($event.target.value)" placeholder="Filter by email">
+      <mat-icon matSuffix>email</mat-icon>
+    </mat-form-field>
+  </div>
 
   <mat-table #table [dataSource]="dataSource">
 
