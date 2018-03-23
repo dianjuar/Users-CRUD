@@ -1,0 +1,71 @@
+<h1 mat-dialog-title>Create an User</h1>
+
+<!-- content -->
+<div mat-dialog-content>
+  <small class="md-warn mat-caption message">The fields with * are required</small>
+
+  <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="user-fields">
+
+    <!-- first name -->
+    <mat-form-field>
+      <input
+        matInput
+        [(ngModel)]="user.firstName" name="firstName"
+        pattern = "^.*(.*\w){2,}.*$"
+        type="text" placeholder="First Name" required>
+    </mat-form-field>
+
+    <!-- last name -->
+    <mat-form-field>
+      <input
+        matInput
+        [(ngModel)]="user.lastName" name="lastName"
+        pattern = "^.*(.*\w){2,}.*$"
+        type="text" placeholder="Second Name" required>
+    </mat-form-field>
+
+    <!-- email -->
+    <mat-form-field>
+      <input
+        matInput
+        [(ngModel)]="user.email" name="email"
+        type="email" placeholder="Email" required>
+    </mat-form-field>
+
+    <!-- phone -->
+    <mat-form-field>
+      <input
+        matInput
+        [(ngModel)]="user.phone" name="phone"
+        pattern = "^\d{9,15}$"
+        type="text" placeholder="Phone Number" required>
+    </mat-form-field>
+
+    <!-- birth date -->
+    <mat-form-field>
+      <input matInput
+        [(ngModel)]="user.birthDate" name="birthDate"
+        [matDatepicker]="picker"
+        [max]="maxDate"
+        (dateChange)="user.setAge()"
+        type="text" placeholder="Birth Date" readonly required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker disabled="false" startView="year" [startAt]="startDate"></mat-datepicker>
+    </mat-form-field>
+
+    <!-- age -->
+    <mat-form-field>
+      <input
+        matInput
+        [(ngModel)]="user.age" name="age"
+        type="text" placeholder="Age" readonly>
+    </mat-form-field>
+
+  </form>
+</div>
+
+<!-- Actions -->
+<div mat-dialog-actions>
+  <button mat-button (click)="closeModal()">Cancel</button>
+  <button mat-button cdkFocusInitial [disabled]="!userForm.form.valid" (click)="submitForm()" color="primary">Create</button>
+</div>
