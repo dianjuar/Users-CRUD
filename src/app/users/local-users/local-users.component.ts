@@ -28,6 +28,11 @@ export class LocalUsersComponent implements OnInit {
   loading;
 
   /**
+   * The data source of the table
+   */
+  dataSource: MatTableDataSource<LocalUser>;
+
+  /**
    * The columns of the table
    */
   readonly displayedColumns = [
@@ -56,9 +61,36 @@ export class LocalUsersComponent implements OnInit {
 
   ngOnInit() {
     this.users = this.localUserService.users;
+    // Init the data source
+    this.dataSource = new MatTableDataSource(this.users);
+
+    // Change the default filtering to filter only by email
+    this.dataSource.filterPredicate = this.filterByEmail;
+  }
+
+  /**
+   * Capture each time the user types to filter the table with
+   * that criteria
+   *
+   * @param emailToSearch The email to search for
+   */
+  emailCriteriaChanged(emailToSearch: string) {
+    emailToSearch = emailToSearch.trim(); // Remove whitespace
+    emailToSearch = emailToSearch.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = emailToSearch;
   }
 
   updateRows() {
     this.table.renderRows();
+  }
+
+  /**
+   * Function to overwrite the custom filtering Material Table
+   *
+   * @param data localUser to filter
+   * @param filter The string to search for
+   */
+  private filterByEmail(data: LocalUser, filter: string): boolean {
+    return data.email.search(filter) !== -1;
   }
 }

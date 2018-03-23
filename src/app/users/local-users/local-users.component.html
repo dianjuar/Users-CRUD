@@ -2,7 +2,11 @@
 
 <div class="mat-elevation-z8">
 
-  <mat-table #table [dataSource]="users">
+  <mat-form-field>
+    <input matInput (keyup)="emailCriteriaChanged($event.target.value)" placeholder="Filter by email">
+  </mat-form-field>
+
+  <mat-table #table [dataSource]="dataSource">
 
     <!-- First Name Column -->
     <ng-container matColumnDef="firstName">
