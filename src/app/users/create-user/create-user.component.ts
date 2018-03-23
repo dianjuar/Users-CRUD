@@ -91,20 +91,23 @@ export class CreateUserComponent implements OnInit {
       .switchMap(() => this.closeModal())
       // When the modal is closed....
       .subscribe(
+        // next
         () => {
           // Show a snack bar to indicate the operation
           this.snackBar.open('User Saved Successfully', 'GOT IT!', {
             duration: 2000,
           });
-        }
-      );
-
-    // Subscribe to know when the process finish
-    this.localUserService.isLoading()
-      .subscribe(
+        },
+        // error
+        (err: string) => {
+          console.log('error', err);
+          this.loading = false;
+        },
+        // complete
         () => {
           this.loading = false;
-        });
+        }
+      );
   }
 
   /**
