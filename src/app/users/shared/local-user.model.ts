@@ -4,6 +4,11 @@
 export class LocalUser {
 
   /**
+   * A unique identifier
+   */
+  id: string;
+
+  /**
    * First name of the user
    */
   firstName: string;
@@ -33,24 +38,38 @@ export class LocalUser {
    */
   age: number;
 
+  /**
+   * The date that the user was created
+   */
+  createdAt: Date;
+
+  /**
+   * The last updated date
+   */
+  updatedAt?: Date;
+
   constructor(
     firstName: string,
     lastName: string,
     email: string,
     phone: string,
     birthDate: Date | string,
+    id?: string,
+    createdAt?: Date,
+    updatedAt?: Date
   ) {
+    // Set the ID or generate a new one
+    this.id = id;
+
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.phone = phone;
 
-    // If the date is an string transform it to a Date
-    if (typeof birthDate === 'string') {
-      this.birthDate = new Date(birthDate);
-    } else {
-      this.birthDate = birthDate;
-    }
+    // Set Dates
+    this.birthDate = this.transformDate(birthDate);
+    this.createdAt = this.transformDate(createdAt);
+    this.updatedAt = this.transformDate(updatedAt);
 
     // Calculate the age
     this.setAge();
@@ -61,7 +80,7 @@ export class LocalUser {
    *
    * @returns {LocalUser} the empty user
    */
-  static initEmptyUser() {
+  static initEmptyUser(): LocalUser {
     return new LocalUser('', '', '', '', null);
   }
 
@@ -82,12 +101,56 @@ export class LocalUser {
   }
 
   /**
+   * Set the update at date
+   *
+   * @param updatedDate The date that was updated
+   */
+  setUpdatedAt(updatedDate: Date | string): void {
+    this.updatedAt = this.transformDate(updatedDate);
+  }
+
+  /**
+   * Set the created at date
+   *
+   * @param createdAt The date that was updated
+   */
+  setCreatedAt(createdAt: Date | string): void {
+    this.createdAt = this.transformDate(createdAt);
+  }
+
+  /**
+   * Get the full name of the user
+   * @returns {string} The full name of the user
+   * @example "Diego Juliao"
+   */
+  getFullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+
+  /**
    * Calculate the age an put it to the attribute
    */
   setAge() {
     if (!!this.birthDate) {
       this.age = LocalUser.calculateYears(this.birthDate);
     }
+  }
+
+
+  /**
+   * Transform a date if it comes as a string
+   *
+   * @param date the date to transform
+   * @returns {Date} the string transformed as date if is a string or a Date... if not will return null
+   */
+  private transformDate(date: Date | string | undefined): Date | null {
+    if (date instanceof Date) {
+      return date as Date;
+    } else if (typeof date === 'string') {
+      return new Date(date as string);
+    }
+
+    return null;
   }
 
 }
