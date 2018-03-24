@@ -62,10 +62,17 @@ export class LocalUserService extends LoadingService {
     // Verify if the email already exits
     if (this.theEmailExists(user.email)) {
       this.loadingDone();
-      return Observable.throw('the email already exits');
+      return Observable.throw({
+        type: 'duplicateEmail',
+        message: 'the email already exits'
+      });
     }
 
     this.http.post(this.usersEndpoint, { })
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Save the user on local storage
       .switchMap((resp: any) => {
         user.id = resp.id;
@@ -78,7 +85,9 @@ export class LocalUserService extends LoadingService {
       .subscribe(
         () => {
           this.loadingDone();
-        }
+        },
+        // On error
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();

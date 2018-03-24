@@ -176,10 +176,21 @@ export class CreateEditUserComponent extends FormControlValidators implements On
           });
         },
         // error
-        (err: string) => {
-          console.log('error', err);
-          this.loading = false;
-          this.emailFormControl.setErrors({ duplicate: true});
+        (err) => {
+          // If the err is because the email is duplicate
+          if (err.type === 'duplicateEmail') {
+            console.log('error', err);
+            this.loading = false;
+            this.emailFormControl.setErrors({ duplicate: true});
+          } else {
+            console.log('error', err);
+            this.loading = false;
+
+            // Indicate the error
+            const snackRef = this.snackBar.open('Connection Error', null, {
+              duration: 10000
+            });
+          }
         },
         // complete
         () => {
