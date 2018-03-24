@@ -37,7 +37,15 @@ export class CreateUserComponent implements OnInit {
   /**
    * Control the names errors
    */
-  nameFormControl = new FormControl('', [
+  firstNameFormControl = new FormControl('', [
+    Validators.required,
+    Validators.pattern(/^.*(.*\w){2,}.*$/),
+  ]);
+
+  /**
+   * Control the names errors
+   */
+  secondNameFormControl = new FormControl('', [
     Validators.required,
     Validators.pattern(/^.*(.*\w){2,}.*$/),
   ]);

@@ -12,13 +12,13 @@
     <mat-form-field>
       <input
         matInput
-        [formControl]="nameFormControl" [errorStateMatcher]="matcher"
+        [formControl]="firstNameFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.firstName" name="firstName"
         placeholder="First Name" required>
-        <mat-error *ngIf="nameFormControl.hasError('pattern') && !nameFormControl.hasError('required')">
+        <mat-error *ngIf="firstNameFormControl.hasError('pattern') && !firstNameFormControl.hasError('required')">
           The first name should have at least <b>2</b> characters
         </mat-error>
-        <mat-error *ngIf="nameFormControl.hasError('required')">
+        <mat-error *ngIf="firstNameFormControl.hasError('required')">
           First Name is required
         </mat-error>
     </mat-form-field>
@@ -27,9 +27,17 @@
     <mat-form-field>
       <input
         matInput
+        [formControl]="secondNameFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.lastName" name="lastName"
         pattern = "^.*(.*\w){2,}.*$"
         type="text" placeholder="Last Name" required>
+        <mat-error *ngIf="secondNameFormControl.hasError('pattern') && !secondNameFormControl.hasError('required')">
+          The last name should have at least
+          <b>2</b> characters
+        </mat-error>
+        <mat-error *ngIf="secondNameFormControl.hasError('required')">
+          Last Name is required
+        </mat-error>
     </mat-form-field>
 
     <!-- email -->
