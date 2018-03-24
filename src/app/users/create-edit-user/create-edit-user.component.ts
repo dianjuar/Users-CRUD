@@ -135,10 +135,11 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   /**
    * Just close the modal because the user doesn't want to do anything
    *
+   * @param dataOnClose the data to pass to the component who opens this modal
    * @returns {Observable<any>} An observable to subscribe an know when the dialog is closed
    */
-  closeModal(): Observable<any> {
-    this.dialogRef.close();
+  closeModal(dataOnClose?: any): Observable<any> {
+    this.dialogRef.close(dataOnClose);
 
     return this.dialogRef.afterClosed();
   }
@@ -165,7 +166,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   private saveNewUser() {
     this.localUserService.saveUser(this.user)
       // Close the modal on success
-      .switchMap(() => this.closeModal())
+      .switchMap(() => this.closeModal('created'))
       // When the modal is closed....
       .subscribe(
         // next
@@ -205,7 +206,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   private updateUser() {
     this.localUserService.updateUser(this.user)
       // Close the modal on success
-      .switchMap(() => this.closeModal())
+      .switchMap(() => this.closeModal('updated'))
       // When the modal is closed....
       .subscribe(
         // next
