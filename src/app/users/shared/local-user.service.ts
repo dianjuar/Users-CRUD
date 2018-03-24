@@ -6,14 +6,20 @@ import { LocalUser } from './local-user.model';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/retry';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/timeout';
 
 import { LoadingService } from '../../shared/loading-service';
 import { LocalStorageService } from 'ngx-localstorage';
+import { MatSnackBar } from '@angular/material';
 
 @Injectable()
 export class LocalUserService extends LoadingService {
@@ -30,7 +36,8 @@ export class LocalUserService extends LoadingService {
 
   constructor(
     private http: HttpClient,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private snackBar: MatSnackBar
   ) {
     super();
 
@@ -55,10 +62,17 @@ export class LocalUserService extends LoadingService {
     // Verify if the email already exits
     if (this.theEmailExists(user.email)) {
       this.loadingDone();
-      return Observable.throw('the email already exits');
+      return Observable.throw({
+        type: 'duplicateEmail',
+        message: 'the email already exits'
+      });
     }
 
     this.http.post(this.usersEndpoint, { })
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Save the user on local storage
       .switchMap((resp: any) => {
         user.id = resp.id;
@@ -71,7 +85,9 @@ export class LocalUserService extends LoadingService {
       .subscribe(
         () => {
           this.loadingDone();
-        }
+        },
+        // On error
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();
@@ -89,12 +105,17 @@ export class LocalUserService extends LoadingService {
     this.imLoading();
 
     this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {})
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Remove the user on local storage
       .switchMap(() => this.removeUserOnLocalStorage(userToDelete))
       .subscribe(
         () => {
           this.loadingDone();
-        }
+        },
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();
@@ -113,6 +134,10 @@ export class LocalUserService extends LoadingService {
     this.imLoading();
 
     this.http.put(this.usersEndpoint, {})
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Save the user on local storage
       .switchMap((resp: any) => {
         // Update updated at date
@@ -123,7 +148,9 @@ export class LocalUserService extends LoadingService {
       .subscribe(
         () => {
           this.loadingDone();
-        }
+        },
+        // On error
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();
@@ -238,4 +265,13 @@ export class LocalUserService extends LoadingService {
       });
   }
 
+  /**
+   * What to do when a connection error happen
+   *
+   * @param err The error triggered
+   */
+  private handleConnectionError(err: any) {
+    this.loading.error(err);
+    this.loadingDone();
+  }
 }

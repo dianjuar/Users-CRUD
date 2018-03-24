@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTable, MatDialog, MatSnackBar } from '@angular/material';
 
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
-import { CreateUserComponent } from '../create-user/create-user.component';
+import { CreateEditUserComponent } from '../create-edit-user/create-edit-user.component';
 
 import { LocalUserService } from '../shared/local-user.service';
 import { LocalUser } from '../shared/local-user.model';
@@ -101,8 +101,8 @@ export class LocalUsersComponent implements OnInit {
       data: user
     });
 
-    // When the dialog is closed it receive the user response
-    dialogRef.afterClosed().subscribe((userToDelete: LocalUser) => {
+    // what to do if the user says "YES I WANT DELETE"
+    const deleteUserFun = (userToDelete: LocalUser) => {
       // If when closing we receive a userID means the the users accepts
       if (userToDelete) {
         // Indicate that we are loading
@@ -112,6 +112,7 @@ export class LocalUsersComponent implements OnInit {
         this.localUserService.deleteUser(userToDelete)
           // On success update table and display a notification
           .subscribe(
+            // Completed successfully
             () => {
               this.loading = false;
               this.updateRows();
@@ -119,10 +120,32 @@ export class LocalUsersComponent implements OnInit {
               this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
                 duration: 2000,
               });
+            },
+            // On error
+            (err) => {
+              this.loading = false;
+              // Indicate the error
+              const snackRef = this.snackBar.open('Connection Error', 'RETRY', {
+                duration: 10000
+              });
+
+              // If the user clicks on retry call the function again to make the request
+              snackRef.onAction()
+                .subscribe(
+                  () => {
+                    // Call itself to repeat the process
+                    deleteUserFun(userToDelete);
+                  }
+                );
             }
           );
       }
-    });
+    };
+
+    // When the dialog is closed it receive the user response
+    dialogRef.afterClosed().subscribe(
+      deleteUserFun
+    );
   }
 
   /**
@@ -130,19 +153,16 @@ export class LocalUsersComponent implements OnInit {
    * @param user
    */
   editUser(user: LocalUser) {
-    const dialogRef = this.dialog.open(CreateUserComponent, {
+    const dialogRef = this.dialog.open(CreateEditUserComponent, {
       width: '50%',
       maxWidth: '500px',
       minWidth: '344px',
       data: Object.assign(LocalUser.initEmptyUser(), user) as LocalUser
     });
 
-    // When the dialog closes, update the rows, probably a new user was created
+    // When the dialog closes, update the rows, probably a new user was edited
     dialogRef.afterClosed().subscribe(
-      () => {
-        this.updateRows();
-        console.log('updated');
-      }
+      () => this.updateRows()
     );
   }
 
