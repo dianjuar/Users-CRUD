@@ -271,7 +271,7 @@ export class LocalUserService extends LoadingService {
    * @param err The error triggered
    */
   private handleConnectionError(err: any) {
-      this.loading.error(err);
-      this.loadingDone();
+    this.loading.error(err);
+    this.loadingDone();
   }
 }

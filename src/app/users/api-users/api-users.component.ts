@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiUserService } from '../shared/api-user.service';
 import { ApiUser } from '../shared/api-user.model';
 import { PageEvent } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-api-users',
@@ -21,7 +22,10 @@ export class ApiUsersComponent implements OnInit {
    */
   loading;
 
-  constructor(public apiUsers: ApiUserService) {
+  constructor(
+    public apiUsers: ApiUserService,
+    private snackBar: MatSnackBar
+  ) {
     // We are loading
     this.loading = true;
 
@@ -42,8 +46,29 @@ export class ApiUsersComponent implements OnInit {
     this.loading = true;
 
     // Fetch the users for the page that we are viewing
-    this.apiUsers.pageChange(page.pageIndex + 1)
-      .subscribe(() => this.loading = false);
+    this.apiUsers.getUsers(page.pageIndex + 1)
+      .subscribe(
+        () => this.loading = false,
+        // on error
+        (err) => {
+          console.log('error', err);
+          this.loading = false;
+
+          // Indicate the error
+          const snackRef = this.snackBar.open('Connection Error', 'RETRY', {
+            duration: 10000
+          });
+
+          // If the user clicks on retry call the function again to make the request
+          snackRef.onAction()
+            .subscribe(
+              () => {
+                // Call itself to repeat the process
+                this.pageChanged(page);
+              }
+            );
+        }
+      );
   }
 
 }
