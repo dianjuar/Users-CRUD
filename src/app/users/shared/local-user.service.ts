@@ -26,7 +26,7 @@ export class LocalUserService extends LoadingService {
   /**
    * The endpoint to "save" the users
    */
-  private readonly saveUsersEndPoint = 'https://reqres.in/api/users';
+  private readonly usersEndpoint = 'https://reqres.in/api/users/';
 
   constructor(
     private http: HttpClient,
@@ -58,9 +58,68 @@ export class LocalUserService extends LoadingService {
       return Observable.throw('the email already exits');
     }
 
-    this.http.post(this.saveUsersEndPoint, { })
+    this.http.post(this.usersEndpoint, { })
       // Save the user on local storage
-      .switchMap(() => this.saveUserOnLocalStorage(user))
+      .switchMap((resp: any) => {
+        user.id = resp.id;
+        user.setCreatedAt(resp.createdAt);
+        // first time user creation the updated at will be same as created at date
+        user.setUpdatedAt(resp.createdAt);
+
+        return this.saveUserOnLocalStorage(user);
+      })
+      .subscribe(
+        () => {
+          this.loadingDone();
+        }
+      );
+
+    return this.isLoading();
+  }
+
+  /**
+   * Delete a user from local storage
+   *
+   * @param userToDelete User to Delete
+   * @returns {Observable<boolean>}
+   *          To subscribe and know it finish. In case the email already exits
+   *          will throw an observable error
+   */
+  deleteUser(userToDelete: LocalUser): Observable<boolean> {
+    this.imLoading();
+
+    this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {})
+      // Remove the user on local storage
+      .switchMap(() => this.removeUserOnLocalStorage(userToDelete))
+      .subscribe(
+        () => {
+          this.loadingDone();
+        }
+      );
+
+    return this.isLoading();
+  }
+
+  /**
+   * Update a user from local storage
+   *
+   * @param userToUpdate User to Delete
+   *
+   * @returns {Observable<boolean>}
+   *          To subscribe and know it finish. In case the email already exits
+   *          will throw an observable error
+   */
+  updateUser(userToUpdate: LocalUser): Observable<boolean> {
+    this.imLoading();
+
+    this.http.put(this.usersEndpoint, {})
+      // Save the user on local storage
+      .switchMap((resp: any) => {
+        // Update updated at date
+        userToUpdate.setUpdatedAt(resp.updatedAt);
+
+        return this.updateOnLocalStorage(userToUpdate);
+      })
       .subscribe(
         () => {
           this.loadingDone();
@@ -89,7 +148,11 @@ export class LocalUserService extends LoadingService {
         localUser.lastName,
         localUser.email,
         localUser.phone,
-        localUser.birthDate))
+        localUser.birthDate,
+        localUser.id,
+        localUser.createdAt,
+        localUser.updatedAt
+      ))
       // Collect all the users in an array
       .reduce((localUsers: Array<LocalUser>, user: LocalUser) => {
         localUsers.push(user);
@@ -135,6 +198,44 @@ export class LocalUserService extends LoadingService {
     return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers)))
       // If everything goes well assign the new user to the localUser array
       .do(() => this.users.push(userToSave));
+  }
+
+  /**
+   * Update on local storage the given user
+   * Try to update it, if goes well push in the array
+   *
+   * @param userUpdated The user to update in the local storage
+   */
+  private updateOnLocalStorage(userUpdated: LocalUser): Observable<any> {
+
+    // Get the index of the user to be edited
+    const index = this.users.findIndex((user: LocalUser) => user.id === userUpdated.id);
+
+    this.users[index] = userUpdated;
+
+    // Update on local storage
+    return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(this.users)));
+  }
+
+  /**
+   * Delete an user form the DB
+   * TODO Verify that the user exits
+   *
+   * @param userToDelete User to be deleted
+   */
+  private removeUserOnLocalStorage(userToDelete: LocalUser): Observable<any> {
+    // Make a clone of the users and remove the user
+    const localUsers = this.users.filter((user: LocalUser) => user.id !== userToDelete.id);
+
+    // Save the array with the user removed on local storage
+    return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers)))
+      // If everything goes well assign the array of users with the user removed to the original array
+      .do(() => {
+        // Quit all the users
+        this.users.splice(0, this.users.length);
+        // Push the new ones
+        this.users.push(...localUsers);
+      });
   }
 
 }

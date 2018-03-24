@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatDatepickerInputEvent, MatSnackBar } from '@angular/material';
+import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
 
 import { LocalUser } from '../shared/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
@@ -17,6 +17,12 @@ import 'rxjs/add/operator/switchMap';
   styleUrls: ['./create-user.component.scss'],
 })
 export class CreateUserComponent implements OnInit {
+
+  /**
+   * Indicate whether the modal is editing or creating a user
+   */
+  onEdit: boolean;
+
   /**
    * Reference to the form
    */
@@ -42,10 +48,11 @@ export class CreateUserComponent implements OnInit {
   /**
    * To indicate if the component is loading
    */
-  loading;
+  loading: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<CreateUserComponent>,
+    @Inject(MAT_DIALOG_DATA) public userToEdit: any,
     private snackBar: MatSnackBar,
     private localUserService: LocalUserService
   ) {
@@ -61,7 +68,14 @@ export class CreateUserComponent implements OnInit {
     // Rest 2 years to today, a two years baby can use this ;)
     this.maxDate.setFullYear(this.maxDate.getFullYear() - 2);
 
-    this.user = LocalUser.initEmptyUser();
+    // If a user to edit is passed, set it as a current user
+    if (!this.userToEdit) {
+      this.onEdit = false;
+      this.user = LocalUser.initEmptyUser();
+    } else {
+      this.user = this.userToEdit;
+      this.onEdit = true;
+    }
   }
 
   ngOnInit() {
@@ -86,6 +100,18 @@ export class CreateUserComponent implements OnInit {
     // Indicate that we are loading
     this.loading = true;
 
+    // If we are editing or creating
+    if (this.onEdit) {
+      this.updateUser();
+    } else {
+      this.saveNewUser();
+    }
+  }
+
+  /**
+   * Save the new user information
+   */
+  private saveNewUser() {
     this.localUserService.saveUser(this.user)
       // Close the modal on success
       .switchMap(() => this.closeModal())
@@ -95,6 +121,34 @@ export class CreateUserComponent implements OnInit {
         () => {
           // Show a snack bar to indicate the operation
           this.snackBar.open('User Saved Successfully', 'GOT IT!', {
+            duration: 2000,
+          });
+        },
+        // error
+        (err: string) => {
+          console.log('error', err);
+          this.loading = false;
+        },
+        // complete
+        () => {
+          this.loading = false;
+        }
+      );
+  }
+
+  /**
+   * Update the current edited user
+   */
+  private updateUser() {
+    this.localUserService.updateUser(this.user)
+      // Close the modal on success
+      .switchMap(() => this.closeModal())
+      // When the modal is closed....
+      .subscribe(
+        // next
+        () => {
+          // Show a snack bar to indicate the operation
+          this.snackBar.open('User Updated Successfully', 'GOT IT!', {
             duration: 2000,
           });
         },

@@ -29,6 +29,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
+import { DeleteConfirmationComponent } from './local-users/delete-confirmation/delete-confirmation.component';
 
 
 @NgModule({
@@ -54,11 +55,12 @@ import { MatTableModule } from '@angular/material/table';
     MatTabsModule,
     MatTableModule
   ],
-  declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent],
+  declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent, DeleteConfirmationComponent],
   exports: [UsersComponent],
   providers: [ApiUserService, LocalUserService],
   entryComponents: [
-    CreateUserComponent
+    CreateUserComponent,
+    DeleteConfirmationComponent
   ]
 })
 export class UsersModule { }

@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { MatTableDataSource, MatTable } from '@angular/material';
+import { MatTableDataSource, MatTable, MatDialog, MatSnackBar } from '@angular/material';
+
+import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
+import { CreateUserComponent } from '../create-user/create-user.component';
 
 import { LocalUserService } from '../shared/local-user.service';
 import { LocalUser } from '../shared/local-user.model';
@@ -25,7 +28,7 @@ export class LocalUsersComponent implements OnInit {
   /**
    * To indicate if the component is loading
    */
-  loading;
+  loading: boolean;
 
   /**
    * The data source of the table
@@ -36,17 +39,20 @@ export class LocalUsersComponent implements OnInit {
    * The columns of the table
    */
   readonly displayedColumns = [
-    'firstName',
-    'lastName',
+    'fullName',
     'email',
     'phone',
     'birthDate',
     'age',
+    'createdAt',
+    'updatedAt',
     'actions',
   ];
 
   constructor(
-    private localUserService: LocalUserService
+    private localUserService: LocalUserService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     // We are loading
     this.loading = true;
@@ -81,7 +87,63 @@ export class LocalUsersComponent implements OnInit {
   }
 
   updateRows() {
+    console.log(this.users);
     this.table.renderRows();
+  }
+
+  /**
+   * Delete a selected user
+   * @param user
+   */
+  deleteUser(user: LocalUser) {
+    // Open the confirmation dialog
+    const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
+      data: user
+    });
+
+    // When the dialog is closed it receive the user response
+    dialogRef.afterClosed().subscribe((userToDelete: LocalUser) => {
+      // If when closing we receive a userID means the the users accepts
+      if (userToDelete) {
+        // Indicate that we are loading
+        this.loading = true;
+
+        // Delete user
+        this.localUserService.deleteUser(userToDelete)
+          // On success update table and display a notification
+          .subscribe(
+            () => {
+              this.loading = false;
+              this.updateRows();
+              // Show a snack bar to indicate the operation
+              this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
+                duration: 2000,
+              });
+            }
+          );
+      }
+    });
+  }
+
+  /**
+   * Update the user
+   * @param user
+   */
+  editUser(user: LocalUser) {
+    const dialogRef = this.dialog.open(CreateUserComponent, {
+      width: '50%',
+      maxWidth: '500px',
+      minWidth: '344px',
+      data: Object.assign(LocalUser.initEmptyUser(), user) as LocalUser
+    });
+
+    // When the dialog closes, update the rows, probably a new user was created
+    dialogRef.afterClosed().subscribe(
+      () => {
+        this.updateRows();
+        console.log('updated');
+      }
+    );
   }
 
   /**
