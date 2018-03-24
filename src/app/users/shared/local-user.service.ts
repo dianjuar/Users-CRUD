@@ -106,10 +106,7 @@ export class LocalUserService extends LoadingService {
         () => {
           this.loadingDone();
         },
-        err => {
-          this.loading.error(err);
-          this.loadingDone();
-        }
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();
@@ -128,6 +125,10 @@ export class LocalUserService extends LoadingService {
     this.imLoading();
 
     this.http.put(this.usersEndpoint, {})
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Save the user on local storage
       .switchMap((resp: any) => {
         // Update updated at date
@@ -138,7 +139,9 @@ export class LocalUserService extends LoadingService {
       .subscribe(
         () => {
           this.loadingDone();
-        }
+        },
+        // On error
+        (err) => this.handleConnectionError(err)
       );
 
     return this.isLoading();
@@ -253,4 +256,13 @@ export class LocalUserService extends LoadingService {
       });
   }
 
+  /**
+   * What to do when a connection error happen
+   *
+   * @param err The error triggered
+   */
+  private handleConnectionError(err: any) {
+      this.loading.error(err);
+      this.loadingDone();
+  }
 }

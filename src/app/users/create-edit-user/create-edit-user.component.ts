@@ -205,9 +205,14 @@ export class CreateEditUserComponent extends FormControlValidators implements On
           });
         },
         // error
-        (err: string) => {
+        (err) => {
           console.log('error', err);
           this.loading = false;
+
+          // Indicate the error
+          const snackRef = this.snackBar.open('Connection Error', null, {
+            duration: 10000
+          });
         },
         // complete
         () => {
