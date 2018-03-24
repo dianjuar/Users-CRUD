@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Components
 import { ApiUsersComponent } from './api-users/api-users.component';
@@ -40,6 +40,7 @@ import { DeleteConfirmationComponent } from './local-users/delete-confirmation/d
       prefix: 'users'
     }),
     LoadingModule,
+    ReactiveFormsModule,
 
     // Material
     MatButtonModule,
