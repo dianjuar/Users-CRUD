@@ -15,7 +15,7 @@ import 'rxjs/add/operator/switchMap';
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+    return !!(control && control.invalid && ( control.touched || isSubmitted));
   }
 }
 
@@ -48,6 +48,14 @@ export class CreateUserComponent implements OnInit {
   secondNameFormControl = new FormControl('', [
     Validators.required,
     Validators.pattern(/^.*(.*\w){2,}.*$/),
+  ]);
+
+  /**
+   * Control the names errors
+   */
+  phoneFormControl = new FormControl('', [
+    Validators.required,
+    Validators.pattern(/^\d{9,15}$/),
   ]);
 
   /**

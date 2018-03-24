@@ -15,12 +15,12 @@
         [formControl]="firstNameFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.firstName" name="firstName"
         placeholder="First Name" required>
-        <mat-error *ngIf="firstNameFormControl.hasError('pattern') && !firstNameFormControl.hasError('required')">
-          The first name should have at least <b>2</b> characters
-        </mat-error>
-        <mat-error *ngIf="firstNameFormControl.hasError('required')">
-          First Name is required
-        </mat-error>
+      <mat-error *ngIf="firstNameFormControl.hasError('pattern') && !firstNameFormControl.hasError('required')">
+        The first name should have at least <b>2</b> characters
+      </mat-error>
+      <mat-error *ngIf="firstNameFormControl.hasError('required')">
+        First Name is required
+      </mat-error>
     </mat-form-field>
 
     <!-- last name -->
@@ -31,13 +31,13 @@
         [(ngModel)]="user.lastName" name="lastName"
         pattern = "^.*(.*\w){2,}.*$"
         type="text" placeholder="Last Name" required>
-        <mat-error *ngIf="secondNameFormControl.hasError('pattern') && !secondNameFormControl.hasError('required')">
-          The last name should have at least
-          <b>2</b> characters
-        </mat-error>
-        <mat-error *ngIf="secondNameFormControl.hasError('required')">
-          Last Name is required
-        </mat-error>
+      <mat-error *ngIf="secondNameFormControl.hasError('pattern') && !secondNameFormControl.hasError('required')">
+        The last name should have at least
+        <b>2</b> characters
+      </mat-error>
+      <mat-error *ngIf="secondNameFormControl.hasError('required')">
+        Last Name is required
+      </mat-error>
     </mat-form-field>
 
     <!-- email -->
@@ -49,21 +49,28 @@
         placeholder="Email" required
         [readonly]="onEdit"
         >
-        <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
-          Please enter a valid email address
-        </mat-error>
-        <mat-error *ngIf="emailFormControl.hasError('required')">
-          Email is required
-        </mat-error>
+      <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+        Please enter a valid email address
+      </mat-error>
+      <mat-error *ngIf="emailFormControl.hasError('required')">
+        Email is required
+      </mat-error>
     </mat-form-field>
 
     <!-- phone -->
     <mat-form-field>
+      <!-- pattern = "^\d{9,15}$" -->
       <input
         matInput
+        [formControl]="phoneFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.phone" name="phone"
-        pattern = "^\d{9,15}$"
         type="text" placeholder="Phone Number" required>
+      <mat-error *ngIf="phoneFormControl.hasError('pattern') && !phoneFormControl.hasError('required')">
+        The phone number must between <b>9 and 15 digits</b>
+      </mat-error>
+      <mat-error *ngIf="phoneFormControl.hasError('required')">
+        Phone is required
+      </mat-error>
     </mat-form-field>
 
     <!-- birth date -->
