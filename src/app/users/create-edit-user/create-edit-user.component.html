@@ -101,8 +101,8 @@
 
 <!-- Actions -->
 <div mat-dialog-actions>
-  <button mat-button (click)="closeModal()">Cancel</button>
+  <button mat-button (click)="closeModal()">CANCEL</button>
   <button mat-button cdkFocusInitial [disabled]="!userForm.form.valid" (click)="submitForm()" color="primary">
-    {{onEdit ? 'Update' : 'Create'}}
+    {{onEdit ? 'UPDATE' : 'CREATE'}}
   </button>
 </div>

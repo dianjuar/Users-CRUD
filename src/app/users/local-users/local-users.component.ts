@@ -18,7 +18,11 @@ export class LocalUsersComponent implements OnInit {
   /**
    * Reference to the table
    */
-  @ViewChild('table') private table: MatTable<LocalUser>;
+  table: MatTable<LocalUser>;
+  @ViewChild('table') set setNewTable(newTable: MatTable<LocalUser>) {
+    this.table = newTable;
+    this.updateRows();
+  }
 
   /**
    * Reference for user list that is on the LocalUserService
@@ -60,7 +64,12 @@ export class LocalUsersComponent implements OnInit {
     this.localUserService.isLoading()
       .subscribe(() => {
         // Update the rows and indicate that the load time finish
-        this.updateRows();
+
+        // Render the table if there is something to show
+        if (this.users.length !== 0) {
+          this.updateRows();
+        }
+
         this.loading = false;
       });
   }
@@ -86,9 +95,13 @@ export class LocalUsersComponent implements OnInit {
     this.dataSource.filter = emailToSearch;
   }
 
+  /**
+   * Update the table rows
+   */
   updateRows() {
-    console.log(this.users);
-    this.table.renderRows();
+    if (this.table) {
+      this.table.renderRows();
+    }
   }
 
   /**
