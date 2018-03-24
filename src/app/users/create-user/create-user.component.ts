@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormGroupDirective, FormControl, Validators } from '@angular/forms';
 
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
 
 import { LocalUser } from '../shared/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
@@ -11,12 +11,33 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 
 
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || isSubmitted));
+  }
+}
+
 @Component({
   selector: 'app-create-user',
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss'],
 })
 export class CreateUserComponent implements OnInit {
+
+  /**
+   * Control the emails errors
+   */
+  emailFormControl = new FormControl('', [
+    Validators.required,
+    Validators.email,
+  ]);
+
+  /**
+   * Match errors
+   */
+  matcher = new MyErrorStateMatcher();
 
   /**
    * Indicate whether the modal is editing or creating a user

@@ -23,17 +23,24 @@
         matInput
         [(ngModel)]="user.lastName" name="lastName"
         pattern = "^.*(.*\w){2,}.*$"
-        type="text" placeholder="Second Name" required>
+        type="text" placeholder="Last Name" required>
     </mat-form-field>
 
     <!-- email -->
     <mat-form-field>
       <input
         matInput
+        [formControl]="emailFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.email" name="email"
-        type="email" placeholder="Email" required
+        placeholder="Email" required
         [readonly]="onEdit"
         >
+        <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+          Please enter a valid email address
+        </mat-error>
+        <mat-error *ngIf="emailFormControl.hasError('required')">
+          Email is required
+        </mat-error>
     </mat-form-field>
 
     <!-- phone -->
