@@ -31,7 +31,9 @@
       <input
         matInput
         [(ngModel)]="user.email" name="email"
-        type="email" placeholder="Email" required>
+        type="email" placeholder="Email" required
+        [readonly]="onEdit"
+        >
     </mat-form-field>
 
     <!-- phone -->
