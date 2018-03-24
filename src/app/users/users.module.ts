@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Components
 import { ApiUsersComponent } from './api-users/api-users.component';
-import { CreateUserComponent } from './create-user/create-user.component';
+import { CreateEditUserComponent } from './create-edit-user/create-edit-user.component';
 import { LocalUsersComponent } from './local-users/local-users.component';
 import { UsersComponent } from './users.component';
 
@@ -56,11 +56,11 @@ import { DeleteConfirmationComponent } from './local-users/delete-confirmation/d
     MatTabsModule,
     MatTableModule
   ],
-  declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateUserComponent, DeleteConfirmationComponent],
+  declarations: [UsersComponent, ApiUsersComponent, LocalUsersComponent, CreateEditUserComponent, DeleteConfirmationComponent],
   exports: [UsersComponent],
   providers: [ApiUserService, LocalUserService],
   entryComponents: [
-    CreateUserComponent,
+    CreateEditUserComponent,
     DeleteConfirmationComponent
   ]
 })

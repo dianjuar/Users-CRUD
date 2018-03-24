@@ -61,11 +61,11 @@ class MyErrorStateMatcher implements ErrorStateMatcher {
 }
 
 @Component({
-  selector: 'app-create-user',
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
+  selector: 'app-create-edit-user',
+  templateUrl: './create-edit-user.component.html',
+  styleUrls: ['./create-edit-user.component.scss'],
 })
-export class CreateUserComponent extends FormControlValidators implements OnInit {
+export class CreateEditUserComponent extends FormControlValidators implements OnInit {
 
   /**
    * Indicate whether the modal is editing or creating a user
@@ -100,7 +100,7 @@ export class CreateUserComponent extends FormControlValidators implements OnInit
   loading: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateUserComponent>,
+    public dialogRef: MatDialogRef<CreateEditUserComponent>,
     @Inject(MAT_DIALOG_DATA) public userToEdit: any,
     private snackBar: MatSnackBar,
     private localUserService: LocalUserService
