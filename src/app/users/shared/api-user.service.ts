@@ -38,9 +38,6 @@ export class ApiUserService extends LoadingService implements Pagination {
     // Init the users array
     this.users = new Array<ApiUser>();
 
-    // Get always the 1st page
-    this.page = 1;
-
     /**
      * Get the users
      */
@@ -49,12 +46,22 @@ export class ApiUserService extends LoadingService implements Pagination {
 
   /**
    * Fetch the users from the API
+   *
+   * @param page Page to fetch
+   * @returns {Observable<boolean>} To subscribe and know it loads
    */
-  getUsers() {
+  getUsers(page: number = 1): Observable<boolean>  {
+    // Assign page
+    this.page = page;
+
     // indicate that we are loading
     this.imLoading();
 
     this.http.get(this.getUsersEndPoint + '?page=' + this.page)
+      // give it 3seconds to make the operation
+      .timeout(3000)
+      // Retry the operation 3 times on error
+      .retry(3)
       // Assign pagination properties
       .do((resp: any) => {
         this.perPage = resp.per_page;
@@ -72,7 +79,6 @@ export class ApiUserService extends LoadingService implements Pagination {
         list.push(user);
         return list;
       }, new Array<ApiUser>())
-      // TODO error handling cases
       // Assign the user list to our list
       .subscribe(
         (userList: Array<ApiUser>) => {
@@ -84,20 +90,13 @@ export class ApiUserService extends LoadingService implements Pagination {
           // The wait is finish
           this.loadingDone();
           // console.log(this.users);
+        },
+        // error
+        (err: any) => {
+          this.loading.error(err);
+          this.loadingDone();
         }
       );
-  }
-
-  /**
-   * Get the users by page
-   *
-   * @param index Index to fetch
-   * @returns {Observable<boolean>} To subscribe and know it loads
-   */
-  pageChange(index: number): Observable<boolean> {
-    this.page = index;
-
-    this.getUsers();
 
     return this.isLoading();
   }

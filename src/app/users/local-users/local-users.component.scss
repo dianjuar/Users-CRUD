@@ -1,16 +1,27 @@
-.icon-table {
-  display: flex;
-  align-items: center;
+.wrapper {
+  min-width: 700px;
 
-  mat-icon {
-    margin-right: 4px;
+  // Filter box
+  .filters {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 16px 5% 0px 0px;
+
+    position: absolute;
+    right: 0;
   }
-}
 
-// Filter box
-.filters {
-  display: flex;
-  justify-content: flex-end;
+  .icon-table {
+    display: flex;
+    align-items: center;
 
-  padding: 16px 5% 0px 0px;
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+
+  mat-table {
+    padding-top: 72px;
+  }
 }

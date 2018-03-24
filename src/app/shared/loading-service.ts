@@ -8,18 +8,19 @@
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/filter';
+import { Subject } from 'rxjs/Subject';
 
 export class LoadingService {
   /**
    * To indicate when we are loading
    */
-  protected loading: BehaviorSubject<boolean>;
+  protected loading: Subject<boolean>;
 
   /**
    * Set the behavior subject to indicate that we are loading
    */
   imLoading() {
-    this.loading = new BehaviorSubject<boolean>(true);
+    this.loading = new Subject<boolean>();
   }
 
   /**
