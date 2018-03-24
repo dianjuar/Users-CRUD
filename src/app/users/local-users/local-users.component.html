@@ -88,7 +88,7 @@
       <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
       <mat-cell *matCellDef="let element">
         <div class="actions">
-          <button mat-icon-button>
+          <button mat-icon-button (click)="editUser(element)">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button (click)="deleteUser(element)">

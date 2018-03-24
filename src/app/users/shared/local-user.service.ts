@@ -88,9 +88,38 @@ export class LocalUserService extends LoadingService {
   deleteUser(userToDelete: LocalUser): Observable<boolean> {
     this.imLoading();
 
-    this.http.put(`${this.usersEndpoint}${userToDelete.id}`, {})
+    this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {})
       // Remove the user on local storage
       .switchMap(() => this.removeUserOnLocalStorage(userToDelete))
+      .subscribe(
+        () => {
+          this.loadingDone();
+        }
+      );
+
+    return this.isLoading();
+  }
+
+  /**
+   * Update a user from local storage
+   *
+   * @param userToUpdate User to Delete
+   *
+   * @returns {Observable<boolean>}
+   *          To subscribe and know it finish. In case the email already exits
+   *          will throw an observable error
+   */
+  updateUser(userToUpdate: LocalUser): Observable<boolean> {
+    this.imLoading();
+
+    this.http.put(this.usersEndpoint, {})
+      // Save the user on local storage
+      .switchMap((resp: any) => {
+        // Update updated at date
+        userToUpdate.setUpdatedAt(resp.updatedAt);
+
+        return this.updateOnLocalStorage(userToUpdate);
+      })
       .subscribe(
         () => {
           this.loadingDone();
@@ -169,6 +198,23 @@ export class LocalUserService extends LoadingService {
     return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers)))
       // If everything goes well assign the new user to the localUser array
       .do(() => this.users.push(userToSave));
+  }
+
+  /**
+   * Update on local storage the given user
+   * Try to update it, if goes well push in the array
+   *
+   * @param userUpdated The user to update in the local storage
+   */
+  private updateOnLocalStorage(userUpdated: LocalUser): Observable<any> {
+
+    // Get the index of the user to be edited
+    const index = this.users.findIndex((user: LocalUser) => user.id === userUpdated.id);
+
+    this.users[index] = userUpdated;
+
+    // Update on local storage
+    return Observable.fromPromise(this.localStorageService.asPromisable().set('users', JSON.stringify(this.users)));
   }
 
   /**

@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Create an User</h1>
+<h1 mat-dialog-title>{{ onEdit ? 'Edit user' : 'Create an User' }}</h1>
 
 <!-- content -->
 <div mat-dialog-content>
@@ -69,5 +69,7 @@
 <!-- Actions -->
 <div mat-dialog-actions>
   <button mat-button (click)="closeModal()">Cancel</button>
-  <button mat-button cdkFocusInitial [disabled]="!userForm.form.valid" (click)="submitForm()" color="primary">Create</button>
+  <button mat-button cdkFocusInitial [disabled]="!userForm.form.valid" (click)="submitForm()" color="primary">
+    {{onEdit ? 'Update' : 'Create'}}
+  </button>
 </div>

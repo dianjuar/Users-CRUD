@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTable, MatDialog, MatSnackBar } from '@angular/material';
 
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
+import { CreateUserComponent } from '../create-user/create-user.component';
 
 import { LocalUserService } from '../shared/local-user.service';
 import { LocalUser } from '../shared/local-user.model';
@@ -27,7 +28,7 @@ export class LocalUsersComponent implements OnInit {
   /**
    * To indicate if the component is loading
    */
-  loading;
+  loading: boolean;
 
   /**
    * The data source of the table
@@ -91,7 +92,7 @@ export class LocalUsersComponent implements OnInit {
   }
 
   /**
-   *
+   * Delete a selected user
    * @param user
    */
   deleteUser(user: LocalUser) {
@@ -122,6 +123,27 @@ export class LocalUsersComponent implements OnInit {
           );
       }
     });
+  }
+
+  /**
+   * Update the user
+   * @param user
+   */
+  editUser(user: LocalUser) {
+    const dialogRef = this.dialog.open(CreateUserComponent, {
+      width: '50%',
+      maxWidth: '500px',
+      minWidth: '344px',
+      data: Object.assign(LocalUser.initEmptyUser(), user) as LocalUser
+    });
+
+    // When the dialog closes, update the rows, probably a new user was created
+    dialogRef.afterClosed().subscribe(
+      () => {
+        this.updateRows();
+        console.log('updated');
+      }
+    );
   }
 
   /**
