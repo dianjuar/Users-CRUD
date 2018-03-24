@@ -190,6 +190,10 @@ export class LocalUserService extends LoadingService {
         (localUsers: Array<LocalUser>) => {
           this.users.push(...localUsers);
           this.loadingDone();
+        },
+        (err: any) => {
+          // Possibly there is no register with that key
+          this.loadingDone();
         }
       );
   }
