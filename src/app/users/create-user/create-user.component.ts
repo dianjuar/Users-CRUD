@@ -10,22 +10,10 @@ import { LocalUserService } from '../shared/local-user.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 
-
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && ( control.touched || isSubmitted));
-  }
-}
-
-@Component({
-  selector: 'app-create-user',
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
-})
-export class CreateUserComponent implements OnInit {
-
+/**
+ * Contains all the Form Controls Validators
+ */
+class FormControlValidators {
   /**
    * Control the emails errors
    */
@@ -62,6 +50,22 @@ export class CreateUserComponent implements OnInit {
    * Match errors
    */
   matcher = new MyErrorStateMatcher();
+}
+
+/** Error when invalid control is dirty, touched, or submitted. */
+class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.touched || isSubmitted));
+  }
+}
+
+@Component({
+  selector: 'app-create-user',
+  templateUrl: './create-user.component.html',
+  styleUrls: ['./create-user.component.scss'],
+})
+export class CreateUserComponent extends FormControlValidators implements OnInit {
 
   /**
    * Indicate whether the modal is editing or creating a user
@@ -101,6 +105,8 @@ export class CreateUserComponent implements OnInit {
     private snackBar: MatSnackBar,
     private localUserService: LocalUserService
   ) {
+    super();
+
     // We are loading
     this.loading = false;
 
