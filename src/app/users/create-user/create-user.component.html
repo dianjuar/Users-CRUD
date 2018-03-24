@@ -12,9 +12,15 @@
     <mat-form-field>
       <input
         matInput
+        [formControl]="nameFormControl" [errorStateMatcher]="matcher"
         [(ngModel)]="user.firstName" name="firstName"
-        pattern = "^.*(.*\w){2,}.*$"
-        type="text" placeholder="First Name" required>
+        placeholder="First Name" required>
+        <mat-error *ngIf="nameFormControl.hasError('pattern') && !nameFormControl.hasError('required')">
+          The first name should have at least <b>2</b> characters
+        </mat-error>
+        <mat-error *ngIf="nameFormControl.hasError('required')">
+          First Name is required
+        </mat-error>
     </mat-form-field>
 
     <!-- last name -->
