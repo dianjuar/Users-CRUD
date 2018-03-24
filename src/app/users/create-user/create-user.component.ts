@@ -19,7 +19,7 @@ class FormControlValidators {
    */
   emailFormControl = new FormControl('', [
     Validators.required,
-    Validators.email,
+    Validators.email
   ]);
 
   /**
@@ -179,6 +179,7 @@ export class CreateUserComponent extends FormControlValidators implements OnInit
         (err: string) => {
           console.log('error', err);
           this.loading = false;
+          this.emailFormControl.setErrors({ duplicate: true});
         },
         // complete
         () => {

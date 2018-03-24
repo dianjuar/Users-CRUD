@@ -55,6 +55,9 @@
       <mat-error *ngIf="emailFormControl.hasError('required')">
         Email is required
       </mat-error>
+      <mat-error *ngIf="emailFormControl.hasError('duplicate')">
+        The email already exists
+      </mat-error>
     </mat-form-field>
 
     <!-- phone -->
