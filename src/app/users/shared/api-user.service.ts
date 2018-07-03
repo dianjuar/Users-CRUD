@@ -1,12 +1,14 @@
+
+import {reduce, switchMap, map, tap, retry, timeout} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { ApiUser } from './api-user.model';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/reduce';
-import 'rxjs/add/operator/switchMap';
+import { Observable } from 'rxjs';
+
+
+
+
 
 import { LoadingService } from '../../shared/loading-service';
 
@@ -57,28 +59,28 @@ export class ApiUserService extends LoadingService implements Pagination {
     // indicate that we are loading
     this.imLoading();
 
-    this.http.get(this.getUsersEndPoint + '?page=' + this.page)
+    this.http.get(this.getUsersEndPoint + '?page=' + this.page).pipe(
       // give it 3seconds to make the operation
-      .timeout(3000)
+      timeout(3000),
       // Retry the operation 3 times on error
-      .retry(3)
+      retry(3),
       // Assign pagination properties
-      .do((resp: any) => {
+      tap((resp: any) => {
         this.perPage = resp.per_page;
         this.total = resp.total;
         this.totalPages = resp.total_pages;
-      })
+      }),
       // Return only the data
-      .map((resp: any) => resp.data)
+      map((resp: any) => resp.data),
       // Return only one user
-      .switchMap((users: Array<any>) => users)
+      switchMap((users: Array<any>) => users),
       // Transform the user from simple json to our model
-      .map((user: any) => new ApiUser(user.id, user.first_name, user.last_name, user.avatar))
+      map((user: any) => new ApiUser(user.id, user.first_name, user.last_name, user.avatar)),
       // Collect all the users in an array
-      .reduce((list: Array<ApiUser>, user: ApiUser): Array<ApiUser> => {
+      reduce((list: Array<ApiUser>, user: ApiUser): Array<ApiUser> => {
         list.push(user);
         return list;
-      }, new Array<ApiUser>())
+      }, new Array<ApiUser>()),)
       // Assign the user list to our list
       .subscribe(
         (userList: Array<ApiUser>) => {

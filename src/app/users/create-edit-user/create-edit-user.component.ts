@@ -1,3 +1,5 @@
+
+import {switchMap} from 'rxjs/operators';
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { NgForm, FormGroupDirective, FormControl, Validators } from '@angular/forms';
 
@@ -7,8 +9,8 @@ import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatche
 import { LocalUser } from '../shared/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/switchMap';
+import { Observable } from 'rxjs';
+
 
 /**
  * Contains all the Form Controls Validators
@@ -164,9 +166,9 @@ export class CreateEditUserComponent extends FormControlValidators implements On
    * Save the new user information
    */
   private saveNewUser() {
-    this.localUserService.saveUser(this.user)
+    this.localUserService.saveUser(this.user).pipe(
       // Close the modal on success
-      .switchMap(() => this.closeModal('created'))
+      switchMap(() => this.closeModal('created')))
       // When the modal is closed....
       .subscribe(
         // next
@@ -204,9 +206,9 @@ export class CreateEditUserComponent extends FormControlValidators implements On
    * Update the current edited user
    */
   private updateUser() {
-    this.localUserService.updateUser(this.user)
+    this.localUserService.updateUser(this.user).pipe(
       // Close the modal on success
-      .switchMap(() => this.closeModal('updated'))
+      switchMap(() => this.closeModal('updated')))
       // When the modal is closed....
       .subscribe(
         // next

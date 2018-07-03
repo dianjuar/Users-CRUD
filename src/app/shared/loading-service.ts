@@ -5,10 +5,9 @@
  * They can subscribe and know when everything is done
  */
 
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import 'rxjs/add/operator/filter';
-import { Subject } from 'rxjs/Subject';
+
+import {filter} from 'rxjs/operators';
+import { Observable ,  BehaviorSubject ,  Subject } from 'rxjs';
 
 export class LoadingService {
   /**
@@ -40,8 +39,8 @@ export class LoadingService {
    * @returns {Observable<boolean>} To subscribe and know it loads
    */
   isLoading(): Observable<boolean> {
-    return this.loading.asObservable()
+    return this.loading.asObservable().pipe(
       // Emit something only when it loads
-      .filter((res: boolean) => res === false);
+      filter((res: boolean) => res === false));
   }
 }
