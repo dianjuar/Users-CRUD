@@ -1,27 +1,15 @@
 
 import {from as observableFrom, throwError as observableThrowError,  Observable } from 'rxjs';
 
-import {map, timeout, reduce, tap, retry, switchMap} from 'rxjs/operators';
+import {map, timeout, reduce, tap, retry, switchMap, toArray} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { LocalUser } from './local-user.model';
 
-
-
-
-
-
-
-
-
-
-
-
-
 import { LoadingService } from '../../shared/loading-service';
-import { LocalStorageService } from 'ngx-localstorage';
-import { MatSnackBar } from '@angular/material';
+import { LocalStorage } from '@ngx-pwa/local-storage';
+
 
 @Injectable()
 export class LocalUserService extends LoadingService {
@@ -38,8 +26,7 @@ export class LocalUserService extends LoadingService {
 
   constructor(
     private http: HttpClient,
-    private localStorageService: LocalStorageService,
-    private snackBar: MatSnackBar
+    private localStorageService: LocalStorage,
   ) {
     super();
 
@@ -83,7 +70,7 @@ export class LocalUserService extends LoadingService {
         user.setUpdatedAt(resp.createdAt);
 
         return this.saveUserOnLocalStorage(user);
-      }),)
+      }))
       .subscribe(
         () => {
           this.loadingDone();
@@ -112,7 +99,7 @@ export class LocalUserService extends LoadingService {
       // Retry the operation 3 times on error
       retry(3),
       // Remove the user on local storage
-      switchMap(() => this.removeUserOnLocalStorage(userToDelete)),)
+      switchMap(() => this.removeUserOnLocalStorage(userToDelete)))
       .subscribe(
         () => {
           this.loadingDone();
@@ -146,7 +133,7 @@ export class LocalUserService extends LoadingService {
         userToUpdate.setUpdatedAt(resp.updatedAt);
 
         return this.updateOnLocalStorage(userToUpdate);
-      }),)
+      }))
       .subscribe(
         () => {
           this.loadingDone();
@@ -166,13 +153,11 @@ export class LocalUserService extends LoadingService {
     this.imLoading();
 
     // Load the stored users
-    observableFrom(this.localStorageService.asPromisable().get('users')).pipe(
-      // Parse the stored array to a json
-      map((usersOnLocalStorage: string) => JSON.parse(usersOnLocalStorage)),
-      // Return only one user
-      switchMap((localUsers: Array<any>) => localUsers),
+    this.localStorageService.getItem<Array<LocalUser>>('users').pipe(
+      // Return only one user of the users gotten or an empty array if there is any user
+      switchMap((localUsers: Array<LocalUser>) => localUsers ? localUsers : []),
       // Transform the user from simple json to our model
-      map((localUser: any) => new LocalUser(
+      map((localUser: LocalUser) => new LocalUser(
         localUser.firstName,
         localUser.lastName,
         localUser.email,
@@ -183,10 +168,7 @@ export class LocalUserService extends LoadingService {
         localUser.updatedAt
       )),
       // Collect all the users in an array
-      reduce((localUsers: Array<LocalUser>, user: LocalUser) => {
-        localUsers.push(user);
-        return localUsers;
-      }, new Array<LocalUser>()),)
+      toArray())
       // Assign the user list to our list
       .subscribe(
         (localUsers: Array<LocalUser>) => {
@@ -222,15 +204,17 @@ export class LocalUserService extends LoadingService {
    *
    * @param userToSave The user to save in the local storage
    */
-  private saveUserOnLocalStorage(userToSave: LocalUser): Observable<any> {
+  private saveUserOnLocalStorage(userToSave: LocalUser): Observable<boolean> {
     // Make a clone of the users and assign the new user
     const localUsers = this.users.slice();
     localUsers.push(userToSave);
 
     // Save on local storage
-    return observableFrom(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers))).pipe(
-      // If everything goes well assign the new user to the localUser array
-      tap(() => this.users.push(userToSave)));
+    return this.localStorageService.setItem('users', localUsers)
+      .pipe(
+        // If everything goes well assign the new user to the localUser array
+        tap(() => this.users.push(userToSave))
+      );
   }
 
   /**
@@ -239,7 +223,7 @@ export class LocalUserService extends LoadingService {
    *
    * @param userUpdated The user to update in the local storage
    */
-  private updateOnLocalStorage(userUpdated: LocalUser): Observable<any> {
+  private updateOnLocalStorage(userUpdated: LocalUser): Observable<boolean> {
 
     // Get the index of the user to be edited
     const index = this.users.findIndex((user: LocalUser) => user.id === userUpdated.id);
@@ -247,12 +231,11 @@ export class LocalUserService extends LoadingService {
     this.users[index] = userUpdated;
 
     // Update on local storage
-    return observableFrom(this.localStorageService.asPromisable().set('users', JSON.stringify(this.users)));
+    return this.localStorageService.setItem('users', this.users);
   }
 
   /**
    * Delete an user form the DB
-   * TODO Verify that the user exits
    *
    * @param userToDelete User to be deleted
    */
@@ -261,7 +244,7 @@ export class LocalUserService extends LoadingService {
     const localUsers = this.users.filter((user: LocalUser) => user.id !== userToDelete.id);
 
     // Save the array with the user removed on local storage
-    return observableFrom(this.localStorageService.asPromisable().set('users', JSON.stringify(localUsers))).pipe(
+    return this.localStorageService.setItem('users', localUsers).pipe(
       // If everything goes well assign the array of users with the user removed to the original array
       tap(() => {
         // Quit all the users

@@ -14,7 +14,6 @@ import { LocalUserService } from './shared/local-user.service';
 
 // Modules
 import { LoadingModule } from 'ngx-loading';
-import { NgxLocalStorageModule } from 'ngx-localstorage';
 
 // Material
 import { MatNativeDateModule } from '@angular/material';
@@ -36,9 +35,6 @@ import { DeleteConfirmationComponent } from './local-users/delete-confirmation/d
   imports: [
     CommonModule,
     FormsModule,
-    NgxLocalStorageModule.forRoot({
-      prefix: 'users'
-    }),
     LoadingModule,
     ReactiveFormsModule,
 
