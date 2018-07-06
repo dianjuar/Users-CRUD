@@ -1,46 +1,72 @@
+export interface ApiUserResponse extends Pagination {
+  data: ApiUser[];
+}
+
+export interface Pagination {
+  /**
+   * Indicates current page that the user is watching in users api list
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  page: number;
+  /**
+   * Indicates how many users will be requested and shown in the list
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  per_page: number;
+  /**
+   * Indicates the total of users in the API
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  total?: number;
+  /**
+   * Total pages needed to display all users
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  total_pages?: number;
+}
+
 /**
  * Model of API user
  */
-export class ApiUser {
+export interface ApiUser {
   /**
    * The ID of the user
    */
-  ID: number;
+  id: number;
 
   /**
    * First Name of the user
    */
-  firstName: string;
+  first_name: string;
 
   /**
    * Last Name of the user
    */
-  lastName: string;
+  last_name: string;
 
   /**
    * The picture or avatar of the user
    * Is an URL
    */
   avatar: string;
+}
 
-  /**
-   * The constructor of the ApiUser with all its attributes
-   *
-   * @param ID
-   * @param firstName
-   * @param lastName
-   * @param avatar
-   */
-  constructor(
-    ID: number,
-    firstName: string,
-    lastName: string,
-    avatar: string) {
+export class ApiUser {
 
-    this.ID = ID;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.avatar = avatar;
+  constructor(apiUser: ApiUser) {
+    for (const key in apiUser) {
+      if (apiUser.hasOwnProperty(key)) {
+        this[key] = apiUser[key];
+      }
+    }
   }
 
   /**
@@ -48,7 +74,7 @@ export class ApiUser {
    * @returns {string} The full name of the user
    * @example "Diego Juliao"
    */
-  getFullName() {
-    return this.firstName + ' ' + this.lastName;
+  get fullName (): string {
+    return this.first_name + ' ' + this.last_name;
   }
 }
