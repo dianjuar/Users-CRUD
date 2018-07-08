@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiUser, ApiUserResponse, Pagination } from './api-user.model';
+import { ApiUser, ApiUserResponse, Pagination } from './models/api-user.model';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';

@@ -1,4 +1,4 @@
-import { BasicModel } from '../../shared/basic-model/basic.model';
+import { BasicModel } from '../../../shared/basic-model/basic.model';
 
 export interface ApiUserResponse extends Pagination {
   data: ApiUser[];

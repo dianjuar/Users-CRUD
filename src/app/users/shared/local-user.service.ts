@@ -5,7 +5,7 @@ import {map, timeout, reduce, tap, retry, switchMap, toArray} from 'rxjs/operato
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { LocalUser } from './local-user.model';
+import { LocalUser } from '../shared/models/local-user.model';
 
 import { LoadingService } from '../../shared/loading-service';
 import { LocalStorage } from '@ngx-pwa/local-storage';
@@ -32,9 +32,6 @@ export class LocalUserService extends LoadingService {
 
     // Init the local users
     this.users = new Array<LocalUser>();
-
-    // Load the users from local storage
-    this.loadLocalUsers();
   }
 
   /**
@@ -149,37 +146,15 @@ export class LocalUserService extends LoadingService {
    * Load the users form the local storage and assign them to
    * our array of users
    */
-  private loadLocalUsers() {
-    this.imLoading();
-
+  loadLocalUsers(): Observable<LocalUser[]> {
     // Load the stored users
-    this.localStorageService.getItem<Array<LocalUser>>('users').pipe(
+    return this.localStorageService.getItem<Array<LocalUser>>('users').pipe(
       // Return only one user of the users gotten or an empty array if there is any user
       switchMap((localUsers: Array<LocalUser>) => localUsers ? localUsers : []),
       // Transform the user from simple json to our model
-      map((localUser: LocalUser) => new LocalUser(
-        localUser.firstName,
-        localUser.lastName,
-        localUser.email,
-        localUser.phone,
-        localUser.birthDate,
-        localUser.id,
-        localUser.createdAt,
-        localUser.updatedAt
-      )),
+      map((localUser: LocalUser) => new LocalUser(localUser)),
       // Collect all the users in an array
-      toArray())
-      // Assign the user list to our list
-      .subscribe(
-        (localUsers: Array<LocalUser>) => {
-          this.users.push(...localUsers);
-          this.loadingDone();
-        },
-        (err: any) => {
-          // Possibly there is no register with that key
-          this.loadingDone();
-        }
-      );
+      toArray());
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { LocalUser } from '../../shared/local-user.model';
+import { LocalUser } from '../../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 

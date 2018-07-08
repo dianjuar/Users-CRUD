@@ -6,7 +6,12 @@ import { DeleteConfirmationComponent } from './delete-confirmation/delete-confir
 import { CreateEditUserComponent } from '../create-edit-user/create-edit-user.component';
 
 import { LocalUserService } from '../shared/local-user.service';
-import { LocalUser } from '../shared/local-user.model';
+import { LocalUser } from '../shared/models/local-user.model';
+
+import { Observable } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { AppState, selectLocalUsers } from '../../store';
+import { ReadLocalUsers } from '../../store/local-users/actions';
 
 @Component({
   selector: 'app-local-users',
@@ -25,9 +30,12 @@ export class LocalUsersComponent implements OnInit {
   }
 
   /**
-   * Reference for user list that is on the LocalUserService
+   * Api users read from the local storage
+   *
+   * @type {Observable<LocalUser[]>}
+   * @memberof LocalUsersComponent
    */
-  users: Array<LocalUser>;
+  users: LocalUser[];
 
   /**
    * To indicate if the component is loading
@@ -56,12 +64,22 @@ export class LocalUsersComponent implements OnInit {
   constructor(
     private localUserService: LocalUserService,
     private snackBar: MatSnackBar,
+    private store: Store<AppState>,
     private dialog: MatDialog
   ) {
     // We are loading
     this.loading = true;
 
-    this.localUserService.isLoading()
+    this.store.pipe(select(selectLocalUsers))
+      .subscribe((users) => {
+        this.users = users;
+        this.dataSource = new MatTableDataSource(this.users);
+        this.loading = false;
+      });
+
+    this.store.dispatch(new ReadLocalUsers());
+
+    /* this.localUserService.isLoading()
       .subscribe(() => {
         // Update the rows and indicate that the load time finish
 
@@ -71,14 +89,10 @@ export class LocalUsersComponent implements OnInit {
         }
 
         this.loading = false;
-      });
+      }); */
   }
 
   ngOnInit() {
-    this.users = this.localUserService.users;
-    // Init the data source
-    this.dataSource = new MatTableDataSource(this.users);
-
     // Change the default filtering to filter only by email
     this.dataSource.filterPredicate = this.filterByEmail;
   }

@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
-import { mergeMap, map, tap, catchError } from 'rxjs/operators';
+import { mergeMap, map, catchError } from 'rxjs/operators';
 
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 
 import { FETCH_USERS_API,
-  FETCH_USERS_API_SUCCESS,
   FetchUsersApi,
   FetchUsersApiSuccess,
   FetchUsersApiFailed} from './actions';
 import { ApiUserService } from '../../users/shared/api-user.service';
-import { ApiUser } from '../../users/shared/api-user.model';
 
 
 @Injectable()

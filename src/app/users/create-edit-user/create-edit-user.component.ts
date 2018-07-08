@@ -6,7 +6,7 @@ import { NgForm, FormGroupDirective, FormControl, Validators } from '@angular/fo
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
 
-import { LocalUser } from '../shared/local-user.model';
+import { LocalUser } from '../shared/models/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
 
 import { Observable } from 'rxjs';
