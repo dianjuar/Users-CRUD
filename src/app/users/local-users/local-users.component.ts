@@ -10,7 +10,7 @@ import { LocalUser } from '../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers } from '../../store';
+import { AppState, selectLocalUsers, selectLocalUsersLoading } from '../../store';
 import { ReadLocalUsers } from '../../store/local-users/actions';
 
 @Component({
@@ -30,22 +30,25 @@ export class LocalUsersComponent implements OnInit {
   }
 
   /**
-   * Api users read from the local storage
+   * To indicate if the component is loading
    *
-   * @type {Observable<LocalUser[]>}
+   * @type {Observable<boolean>}
    * @memberof LocalUsersComponent
    */
-  users: LocalUser[];
-
-  /**
-   * To indicate if the component is loading
-   */
-  loading: boolean;
+  loading: Observable<boolean>;
 
   /**
    * The data source of the table
    */
   dataSource: MatTableDataSource<LocalUser>;
+
+  /**
+   * There list of users is Empty
+   *
+   * @type {boolean}
+   * @memberof LocalUsersComponent
+   */
+  isEmpty: boolean;
 
   /**
    * The columns of the table
@@ -67,14 +70,12 @@ export class LocalUsersComponent implements OnInit {
     private store: Store<AppState>,
     private dialog: MatDialog
   ) {
-    // We are loading
-    this.loading = true;
+    this.loading = this.store.pipe(select(selectLocalUsersLoading));
 
     this.store.pipe(select(selectLocalUsers))
       .subscribe((users) => {
-        this.users = users;
-        this.dataSource = new MatTableDataSource(this.users);
-        this.loading = false;
+        this.isEmpty = users.length === 0;
+        this.dataSource = new MatTableDataSource(users);
       });
 
     this.store.dispatch(new ReadLocalUsers());
@@ -133,7 +134,7 @@ export class LocalUsersComponent implements OnInit {
       // If when closing we receive a userID means the the users accepts
       if (userToDelete) {
         // Indicate that we are loading
-        this.loading = true;
+        // this.loading = true;
 
         // Delete user
         this.localUserService.deleteUser(userToDelete)
@@ -141,7 +142,7 @@ export class LocalUsersComponent implements OnInit {
           .subscribe(
             // Completed successfully
             () => {
-              this.loading = false;
+              // this.loading = false;
               this.updateRows();
               // Show a snack bar to indicate the operation
               this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
@@ -150,7 +151,7 @@ export class LocalUsersComponent implements OnInit {
             },
             // On error
             (err) => {
-              this.loading = false;
+              // this.loading = false;
               // Indicate the error
               const snackRef = this.snackBar.open('Connection Error', 'RETRY', {
                 duration: 10000

@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 
 import { Observable } from 'rxjs';
-import { mergeMap, map, catchError } from 'rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 
 import { LocalUserService } from '../../users/shared/local-user.service';
 import { READ_LOCAL_USERS, ReadLocalUsers, ReadLocalUsersSuccess } from './actions';

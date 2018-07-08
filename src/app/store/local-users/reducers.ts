@@ -3,10 +3,12 @@ import * as LocalUserActions from './actions';
 
 export interface LocalUsersState {
   users: LocalUser[];
+  loading: boolean;
 }
 
 export const initialLocalUsersState: LocalUsersState = {
-  users: []
+  users: [],
+  loading: false
 };
 
 export function localUserReducer(
@@ -15,9 +17,17 @@ export function localUserReducer(
 ): LocalUsersState {
 
   switch (action.type) {
+    case LocalUserActions.READ_LOCAL_USERS: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
     case LocalUserActions.READ_LOCAL_USERS_SUCCESS: {
       return {
         ...state,
+        loading: false,
         users: action.payload
       };
     }

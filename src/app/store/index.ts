@@ -38,6 +38,11 @@ export const selectApiUsersErrorOnFetching = createSelector(
 
 // Local Users selectors
 export const selectLocalUsersFeature = (state: AppState) => state.localUsers;
+export const selectLocalUsersLoading = createSelector(
+  selectLocalUsersFeature,
+  (state: LocalUsersState) => state.loading
+);
+
 export const selectLocalUsers = createSelector(
   selectLocalUsersFeature,
   (state: LocalUsersState) => state.users

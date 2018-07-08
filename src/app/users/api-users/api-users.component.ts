@@ -105,7 +105,6 @@ export class ApiUsersComponent implements OnInit, OnDestroy {
     // Get current page being loaded
     this.paginationSubs = this.pagination.subscribe((pagination: Pagination) => {
       this.currentPagination = pagination;
-
     });
 
     // What to do in case of error
