@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { CreateEditUserComponent } from './create-edit-user/create-edit-user.component';
+import { CreateEditUserComponent, CLOSE_MODAL_TYPES } from './create-edit-user/create-edit-user.component';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTabGroup, MatTab } from '@angular/material';
 import { LocalUsersComponent } from './local-users/local-users.component';
@@ -35,13 +35,13 @@ export class UsersComponent implements OnInit {
     // When the dialog closes, update the rows, probably a new user was created
     dialogRef.afterClosed()
       .subscribe(
-        (dataOnClose: any) => {
+        (dataOnClose: CLOSE_MODAL_TYPES) => {
 
           if (dataOnClose) {
             this.localUsersComponent.updateRows();
           }
 
-          if (dataOnClose === 'created') {
+          if (dataOnClose === CLOSE_MODAL_TYPES.USER_CREATED) {
             this.tab.selectedIndex = 1;
           }
         }

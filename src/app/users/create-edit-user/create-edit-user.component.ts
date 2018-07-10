@@ -168,7 +168,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   private saveNewUser() {
     this.localUserService.saveUser(this.user).pipe(
       // Close the modal on success
-      switchMap(() => this.closeModal('created')))
+      switchMap(() => this.closeModal(CLOSE_MODAL_TYPES.USER_CREATED)))
       // When the modal is closed....
       .subscribe(
         // next
@@ -208,7 +208,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   private updateUser() {
     this.localUserService.updateUser(this.user).pipe(
       // Close the modal on success
-      switchMap(() => this.closeModal('updated')))
+      switchMap(() => this.closeModal(CLOSE_MODAL_TYPES.USER_UPDATED)))
       // When the modal is closed....
       .subscribe(
         // next
@@ -242,4 +242,16 @@ export class CreateEditUserComponent extends FormControlValidators implements On
     // console.log(this.userForm);
     this.userForm.ngSubmit.next();
   }
+}
+
+
+/**
+ * Classify the different options that the modal will close
+ *
+ * @export
+ * @enum {number}
+ */
+export enum CLOSE_MODAL_TYPES {
+  USER_CREATED,
+  USER_UPDATED
 }
