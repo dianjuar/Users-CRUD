@@ -9,6 +9,8 @@ import { LocalUser } from '../shared/models/local-user.model';
 
 import { LoadingService } from '../../shared/loading-service';
 import { LocalStorage } from '@ngx-pwa/local-storage';
+import { Store, select } from '@ngrx/store';
+import { AppState, selectLocalUsers } from '../../store';
 
 
 @Injectable()
@@ -27,34 +29,35 @@ export class LocalUserService extends LoadingService {
   constructor(
     private http: HttpClient,
     private localStorageService: LocalStorage,
+    private store: Store<AppState>
   ) {
     super();
 
-    // Init the local users
-    this.users = new Array<LocalUser>();
+    // Get the local users from the store
+    this.store.pipe(select(selectLocalUsers))
+      .subscribe((users) => {
+        this.users = users;
+      });
   }
 
   /**
-   * Save user and return an observable to know when we finish the operation
+   * Do the post to know the user ID, then, save the users on the local
+   * storage
    *
    * @param user The user to save
-   * @returns {Observable<boolean | string>}
-   *          To subscribe and know it finish. In case the email already exits
-   *          will throw an observable error
+   * @returns {Observable<LocalUser>} The observable with created user
    */
-  saveUser(user: LocalUser): Observable<boolean | string> {
-    this.imLoading();
-
+  saveUser(user: LocalUser): Observable<LocalUser> {
     // Verify if the email already exits
-    if (this.theEmailExists(user.email)) {
+    /* if (this.theEmailExists(user.email)) {
       this.loadingDone();
       return observableThrowError({
         type: 'duplicateEmail',
         message: 'the email already exits'
       });
-    }
+    } */
 
-    this.http.post(this.usersEndpoint, { }).pipe(
+    return this.http.post(this.usersEndpoint, { }).pipe(
       // give it 3seconds to make the operation
       timeout(3000),
       // Retry the operation 3 times on error
@@ -66,17 +69,17 @@ export class LocalUserService extends LoadingService {
         // first time user creation the updated at will be same as created at date
         user.setUpdatedAt(resp.createdAt);
 
-        return this.saveUserOnLocalStorage(user);
-      }))
-      .subscribe(
-        () => {
-          this.loadingDone();
-        },
-        // On error
-        (err) => this.handleConnectionError(err)
-      );
+        // Make a clone of the users and assign the new user
+        const localUsers = this.users.slice();
+        // Insert new user
+        localUsers.push(user);
 
-    return this.isLoading();
+        // Save on local storage
+        return this.localStorageService.setItem('users', localUsers);
+      }),
+      // Return the user just created
+      map(() => user)
+    );
   }
 
   /**
@@ -171,25 +174,6 @@ export class LocalUserService extends LoadingService {
       .map((localUser: LocalUser) => localUser.email)
       // Filter only the email
       .some((userEmail) => userEmail === emailToCheck);
-  }
-
-  /**
-   * Save on local storage the given user
-   * Try to save it, if goes well push in the array
-   *
-   * @param userToSave The user to save in the local storage
-   */
-  private saveUserOnLocalStorage(userToSave: LocalUser): Observable<boolean> {
-    // Make a clone of the users and assign the new user
-    const localUsers = this.users.slice();
-    localUsers.push(userToSave);
-
-    // Save on local storage
-    return this.localStorageService.setItem('users', localUsers)
-      .pipe(
-        // If everything goes well assign the new user to the localUser array
-        tap(() => this.users.push(userToSave))
-      );
   }
 
   /**

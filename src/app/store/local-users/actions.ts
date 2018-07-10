@@ -1,8 +1,38 @@
 import { Action } from '@ngrx/store';
 import { LocalUser } from '../../users/shared/models/local-user.model';
 
+export const CREATE_LOCAL_USERS = '[Local Users] Create';
+export const CREATE_LOCAL_USERS_SUCCESS = '[Local Users] Create Success';
+
 export const READ_LOCAL_USERS = '[Local Users] Read';
 export const READ_LOCAL_USERS_SUCCESS = '[Local Users] Read Success';
+
+/**
+ * Action to create an user
+ *
+ * @export
+ * @class Class
+ * @implements {Action}
+ */
+export class CreateLocalUser implements Action {
+  readonly type = CREATE_LOCAL_USERS;
+
+  constructor(public payload: LocalUser) { }
+}
+
+/**
+ * Action to indicate that the user creation finish
+ * successfully
+ *
+ * @export
+ * @class Class
+ * @implements {Action}
+ */
+export class CreateLocalUserSuccess implements Action {
+  readonly type = CREATE_LOCAL_USERS_SUCCESS;
+
+  constructor(public payload: LocalUser) { }
+}
 
 /**
  * Action to read users from the local storage
@@ -31,5 +61,7 @@ export class ReadLocalUsersSuccess implements Action {
 }
 
 export type All =
+  CreateLocalUser |
+  CreateLocalUserSuccess |
   ReadLocalUsers |
   ReadLocalUsersSuccess;

@@ -47,3 +47,8 @@ export const selectLocalUsers = createSelector(
   selectLocalUsersFeature,
   (state: LocalUsersState) => state.users
 );
+
+export const selectLocalUserCreated = createSelector(
+  selectLocalUsersFeature,
+  (state: LocalUsersState) => state.userCreated
+);

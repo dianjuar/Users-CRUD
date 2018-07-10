@@ -7,11 +7,31 @@ import { Observable } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 
 import { LocalUserService } from '../../users/shared/local-user.service';
-import { READ_LOCAL_USERS, ReadLocalUsers, ReadLocalUsersSuccess } from './actions';
+import {
+  CREATE_LOCAL_USERS,
+  CreateLocalUser,
+  CreateLocalUserSuccess,
+  READ_LOCAL_USERS,
+  ReadLocalUsers,
+  ReadLocalUsersSuccess,
+} from './actions';
 
 
 @Injectable()
 export class LocalUsersEffects {
+
+  // Listen for the 'CREATE_LOCAL_USERS' action
+  @Effect()
+  createUserOnLocal$: Observable<Action> = this.actions$.pipe(
+    ofType(CREATE_LOCAL_USERS),
+    mergeMap((action: CreateLocalUser) =>
+      this.localUserService.saveUser(action.payload).pipe(
+        // If successful, dispatch success action with the user created
+        map(user => new CreateLocalUserSuccess(user)),
+      )
+    )
+  );
+
   // Listen for the 'FETCH_USERS_API' action
   @Effect()
   readUsersFromLocal$: Observable<Action> = this.actions$.pipe(
@@ -23,6 +43,7 @@ export class LocalUsersEffects {
       )
     )
   );
+
 
   constructor(
     private actions$: Actions,

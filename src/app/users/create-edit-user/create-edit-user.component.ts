@@ -1,15 +1,18 @@
-
-import {switchMap} from 'rxjs/operators';
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { NgForm, FormGroupDirective, FormControl, Validators } from '@angular/forms';
 
 import { MatDialogRef } from '@angular/material/dialog';
+
 import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
+import { switchMap, filter } from 'rxjs/operators';
 
 import { LocalUser } from '../shared/models/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
 
 import { Observable } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { AppState, selectLocalUserCreated } from '../../store';
+import { CreateLocalUser } from '../../store/local-users/actions';
 
 
 /**
@@ -102,10 +105,11 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   loading: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateEditUserComponent>,
     @Inject(MAT_DIALOG_DATA) public userToEdit: any,
+    public dialogRef: MatDialogRef<CreateEditUserComponent>,
+    private localUserService: LocalUserService,
     private snackBar: MatSnackBar,
-    private localUserService: LocalUserService
+    private store: Store<AppState>
   ) {
     super();
 
@@ -129,6 +133,23 @@ export class CreateEditUserComponent extends FormControlValidators implements On
       this.user = this.userToEdit;
       this.onEdit = true;
     }
+
+    // Subscribe to user created information to indicate
+    this.store.pipe(
+      select(selectLocalUserCreated),
+      // Ignore undefined values
+      filter(userCreated => !!userCreated)
+    )
+      .subscribe((userCreated: LocalUser) => {
+        // Close the modal
+        // TODO, don't use this, use the same selector to know why we close the modal
+        this.closeModal(CLOSE_MODAL_TYPES.USER_CREATED);
+
+        // Show a snack bar to indicate the operation
+        this.snackBar.open('User Created Successfully', 'GOT IT!', {
+          duration: 2000,
+        });
+      });
   }
 
   ngOnInit() {
@@ -173,17 +194,14 @@ export class CreateEditUserComponent extends FormControlValidators implements On
    * Save the new user information
    */
   private saveNewUser() {
-    this.localUserService.saveUser(this.user).pipe(
-      // Close the modal on success
-      switchMap(() => this.closeModal(CLOSE_MODAL_TYPES.USER_CREATED)))
+    this.store.dispatch(new CreateLocalUser(this.user));
+
+
+
       // When the modal is closed....
-      .subscribe(
+      /* .subscribe(
         // next
         () => {
-          // Show a snack bar to indicate the operation
-          this.snackBar.open('User Saved Successfully', 'GOT IT!', {
-            duration: 2000,
-          });
         },
         // error
         (err) => {
@@ -201,12 +219,8 @@ export class CreateEditUserComponent extends FormControlValidators implements On
               duration: 10000
             });
           }
-        },
-        // complete
-        () => {
-          this.loading = false;
         }
-      );
+      );*/
   }
 
   /**
