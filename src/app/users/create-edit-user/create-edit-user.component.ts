@@ -148,7 +148,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
 
   /**
    * Catch the event of the form submit and go to save the user
-   * after that show a message
+   * after that, show a message
    */
   onSubmit() {
     // Indicate that we are loading
@@ -160,6 +160,13 @@ export class CreateEditUserComponent extends FormControlValidators implements On
     } else {
       this.saveNewUser();
     }
+  }
+
+  /**
+   * Trigger the submit of the new user form
+   */
+  submitForm() {
+    this.userForm.ngSubmit.next();
   }
 
   /**
@@ -233,14 +240,6 @@ export class CreateEditUserComponent extends FormControlValidators implements On
           this.loading = false;
         }
       );
-  }
-
-  /**
-   * Trigger the submit of the new user form
-   */
-  submitForm() {
-    // console.log(this.userForm);
-    this.userForm.ngSubmit.next();
   }
 }
 
