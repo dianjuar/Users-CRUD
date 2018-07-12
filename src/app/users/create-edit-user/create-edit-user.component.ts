@@ -11,9 +11,8 @@ import { LocalUserService } from '../shared/local-user.service';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUserCreated } from '../../store';
+import { AppState, selectLocalUsersLoadingCUD } from '../../store';
 import { CreateLocalUser } from '../../store/local-users/actions';
-
 
 /**
  * Contains all the Form Controls Validators
@@ -101,8 +100,11 @@ export class CreateEditUserComponent extends FormControlValidators implements On
 
   /**
    * To indicate if the component is loading
+   *
+   * @type {Observable<boolean>}
+   * @memberof LocalUsersComponent
    */
-  loading: boolean;
+  loading: Observable<boolean>;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public userToEdit: any,
@@ -113,8 +115,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   ) {
     super();
 
-    // We are loading
-    this.loading = false;
+    this.loading = this.store.pipe(select(selectLocalUsersLoadingCUD));
 
     // Set the start dates
     this.startDate = new Date();
@@ -133,23 +134,6 @@ export class CreateEditUserComponent extends FormControlValidators implements On
       this.user = this.userToEdit;
       this.onEdit = true;
     }
-
-    // Subscribe to user created information to indicate
-    this.store.pipe(
-      select(selectLocalUserCreated),
-      // Ignore undefined values
-      filter(userCreated => !!userCreated)
-    )
-      .subscribe((userCreated: LocalUser) => {
-        // Close the modal
-        // TODO, don't use this, use the same selector to know why we close the modal
-        this.closeModal(CLOSE_MODAL_TYPES.USER_CREATED);
-
-        // Show a snack bar to indicate the operation
-        this.snackBar.open('User Created Successfully', 'GOT IT!', {
-          duration: 2000,
-        });
-      });
   }
 
   ngOnInit() {
@@ -172,9 +156,6 @@ export class CreateEditUserComponent extends FormControlValidators implements On
    * after that, show a message
    */
   onSubmit() {
-    // Indicate that we are loading
-    this.loading = true;
-
     // If we are editing or creating
     if (this.onEdit) {
       this.updateUser();
@@ -229,7 +210,7 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   private updateUser() {
     this.localUserService.updateUser(this.user).pipe(
       // Close the modal on success
-      switchMap(() => this.closeModal(CLOSE_MODAL_TYPES.USER_UPDATED)))
+      switchMap(() => this.closeModal()))
       // When the modal is closed....
       .subscribe(
         // next
@@ -242,29 +223,12 @@ export class CreateEditUserComponent extends FormControlValidators implements On
         // error
         (err) => {
           console.log('error', err);
-          this.loading = false;
 
           // Indicate the error
           const snackRef = this.snackBar.open('Connection Error', null, {
             duration: 10000
           });
         },
-        // complete
-        () => {
-          this.loading = false;
-        }
       );
   }
-}
-
-
-/**
- * Classify the different options that the modal will close
- *
- * @export
- * @enum {number}
- */
-export enum CLOSE_MODAL_TYPES {
-  USER_CREATED,
-  USER_UPDATED
 }

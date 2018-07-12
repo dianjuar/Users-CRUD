@@ -2,7 +2,7 @@
 
 <!-- content -->
 <div mat-dialog-content>
-  <ngx-loading [show]="loading"></ngx-loading>
+  <ngx-loading [show]="loading | async"></ngx-loading>
 
   <small class="md-warn mat-caption message">The fields with * are required</small>
 

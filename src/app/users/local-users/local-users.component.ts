@@ -10,7 +10,7 @@ import { LocalUser } from '../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers, selectLocalUsersLoading } from '../../store';
+import { AppState, selectLocalUsers, selectLocalUsersLoadingReading } from '../../store';
 import { ReadLocalUsers } from '../../store/local-users/actions';
 
 @Component({
@@ -70,7 +70,7 @@ export class LocalUsersComponent implements OnInit {
     private store: Store<AppState>,
     private dialog: MatDialog
   ) {
-    this.loading = this.store.pipe(select(selectLocalUsersLoading));
+    this.loading = this.store.pipe(select(selectLocalUsersLoadingReading));
 
     this.store.pipe(select(selectLocalUsers))
       .subscribe((users) => {
@@ -79,18 +79,6 @@ export class LocalUsersComponent implements OnInit {
       });
 
     this.store.dispatch(new ReadLocalUsers());
-
-    /* this.localUserService.isLoading()
-      .subscribe(() => {
-        // Update the rows and indicate that the load time finish
-
-        // Render the table if there is something to show
-        if (this.users.length !== 0) {
-          this.updateRows();
-        }
-
-        this.loading = false;
-      }); */
   }
 
   ngOnInit() {
