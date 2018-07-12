@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { MatTableDataSource, MatTable, MatDialog, MatSnackBar } from '@angular/material';
+import { MatTableDataSource, MatTable, MatDialog, MatSnackBar, MatDialogRef } from '@angular/material';
 
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
 import { CreateEditUserComponent } from '../create-edit-user/create-edit-user.component';
@@ -10,8 +10,9 @@ import { LocalUser } from '../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers, selectLocalUsersLoadingReading } from '../../store';
+import { AppState, selectLocalUsers, selectLocalUsersLoadingReading, selectLocalUserDeleted } from '../../store';
 import { ReadLocalUsers } from '../../store/local-users/actions';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-local-users',
@@ -28,6 +29,20 @@ export class LocalUsersComponent implements OnInit {
     this.table = newTable;
     this.updateRows();
   }
+
+  /**
+   * The columns of the table
+   */
+  readonly displayedColumns = [
+    'fullName',
+    'email',
+    'phone',
+    'birthDate',
+    'age',
+    'createdAt',
+    'updatedAt',
+    'actions',
+  ];
 
   /**
    * To indicate if the component is loading
@@ -51,18 +66,13 @@ export class LocalUsersComponent implements OnInit {
   isEmpty: boolean;
 
   /**
-   * The columns of the table
+   * A reference of the current dialog present
+   *
+   * @private
+   * @type {MatDialogRef<CreateEditUserComponent>}
+   * @memberof UsersComponent
    */
-  readonly displayedColumns = [
-    'fullName',
-    'email',
-    'phone',
-    'birthDate',
-    'age',
-    'createdAt',
-    'updatedAt',
-    'actions',
-  ];
+  private dialogRef: MatDialogRef<CreateEditUserComponent | DeleteConfirmationComponent>;
 
   constructor(
     private localUserService: LocalUserService,
@@ -79,6 +89,22 @@ export class LocalUsersComponent implements OnInit {
       });
 
     this.store.dispatch(new ReadLocalUsers());
+
+    // Subscribe to user created information to indicate
+    this.store.pipe(
+      select(selectLocalUserDeleted),
+      // Ignore undefined values
+      filter(userDeleted => !!userDeleted)
+    )
+      .subscribe((userDeleted: LocalUser) => {
+        // Close the modal
+        this.dialogRef.close();
+
+        // Show a snack bar to indicate the operation
+        this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
+          duration: 2000,
+        });
+      });
   }
 
   ngOnInit() {
@@ -113,13 +139,12 @@ export class LocalUsersComponent implements OnInit {
    */
   deleteUser(user: LocalUser) {
     // Open the confirmation dialog
-    const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
+    this.dialogRef = this.dialog.open(DeleteConfirmationComponent, {
       data: user
     });
 
     // what to do if the user says "YES I WANT DELETE"
-    const deleteUserFun = (userToDelete: LocalUser) => {
-      // If when closing we receive a userID means the the users accepts
+    /* const deleteUserFun = (userToDelete: LocalUser) => {
       if (userToDelete) {
         // Indicate that we are loading
         // this.loading = true;
@@ -133,12 +158,10 @@ export class LocalUsersComponent implements OnInit {
               // this.loading = false;
               this.updateRows();
               // Show a snack bar to indicate the operation
-              this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
-                duration: 2000,
-              });
+
             },
             // On error
-            (err) => {
+             (err) => {
               // this.loading = false;
               // Indicate the error
               const snackRef = this.snackBar.open('Connection Error', 'RETRY', {
@@ -155,13 +178,8 @@ export class LocalUsersComponent implements OnInit {
                 );
             }
           );
-      }
-    };
-
-    // When the dialog is closed it receive the user response
-    dialogRef.afterClosed().subscribe(
-      deleteUserFun
-    );
+        }
+    }; */
   }
 
   /**

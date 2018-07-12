@@ -1,20 +1,19 @@
-
-import {from as observableFrom, throwError as observableThrowError,  Observable } from 'rxjs';
-
-import {map, timeout, reduce, tap, retry, switchMap, toArray} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { of, throwError,  Observable } from 'rxjs';
+import { map, timeout, reduce, tap, retry, switchMap, toArray } from 'rxjs/operators';
+
 import { LocalUser } from '../shared/models/local-user.model';
 
-import { LoadingService } from '../../shared/loading-service';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Store, select } from '@ngrx/store';
 import { AppState, selectLocalUsers } from '../../store';
+import { DeleteLocalUserSuccessPayloadModel } from '../../store/local-users/actions';
 
 
 @Injectable()
-export class LocalUserService extends LoadingService {
+export class LocalUserService {
 
   /**
    * List of users saved on local storage
@@ -31,8 +30,6 @@ export class LocalUserService extends LoadingService {
     private localStorageService: LocalStorage,
     private store: Store<AppState>
   ) {
-    super();
-
     // Get the local users from the store
     this.store.pipe(select(selectLocalUsers))
       .subscribe((users) => {
@@ -45,9 +42,9 @@ export class LocalUserService extends LoadingService {
    * storage
    *
    * @param user The user to save
-   * @returns {Observable<LocalUser>} The observable with created user
+   * @returns {Observable<boolean>} The observable with created user
    */
-  saveUser(user: LocalUser): Observable<LocalUser> {
+  saveUser(user: LocalUser): Observable<boolean> {
     // Verify if the email already exits
     /* if (this.theEmailExists(user.email)) {
       this.loadingDone();
@@ -76,9 +73,7 @@ export class LocalUserService extends LoadingService {
 
         // Save on local storage
         return this.localStorageService.setItem('users', localUsers);
-      }),
-      // Return the user just created
-      map(() => user)
+      })
     );
   }
 
@@ -86,28 +81,35 @@ export class LocalUserService extends LoadingService {
    * Delete a user from local storage
    *
    * @param userToDelete User to Delete
-   * @returns {Observable<boolean>}
-   *          To subscribe and know it finish. In case the email already exits
-   *          will throw an observable error
+   * @returns {Observable<DeleteLocalUserSuccessPayloadModel>}
    */
-  deleteUser(userToDelete: LocalUser): Observable<boolean> {
-    this.imLoading();
+  deleteUser(userToDelete: LocalUser): Observable<DeleteLocalUserSuccessPayloadModel> {
+    let newUsersArray: Array<LocalUser>;
 
-    this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {}).pipe(
+    return this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {}).pipe(
       // give it 3seconds to make the operation
       timeout(3000),
       // Retry the operation 3 times on error
       retry(3),
       // Remove the user on local storage
-      switchMap(() => this.removeUserOnLocalStorage(userToDelete)))
-      .subscribe(
+      switchMap(() => {
+        // Make a clone of the users and remove the user
+        newUsersArray = this.users.filter((user: LocalUser) => user.id !== userToDelete.id);
+
+        // Save the array with the user removed on local storage
+        return this.localStorageService.setItem('users', newUsersArray);
+      }),
+      map(() => <DeleteLocalUserSuccessPayloadModel>{
+        deletedUser: userToDelete,
+        users: newUsersArray
+      })
+    );
+      /* .subscribe(
         () => {
-          this.loadingDone();
+          // this.loadingDone();
         },
         (err) => this.handleConnectionError(err)
-      );
-
-    return this.isLoading();
+      ); */
   }
 
   /**
@@ -120,7 +122,7 @@ export class LocalUserService extends LoadingService {
    *          will throw an observable error
    */
   updateUser(userToUpdate: LocalUser): Observable<boolean> {
-    this.imLoading();
+    // this.imLoading();
 
     this.http.put(this.usersEndpoint, {}).pipe(
       // give it 3seconds to make the operation
@@ -136,13 +138,13 @@ export class LocalUserService extends LoadingService {
       }))
       .subscribe(
         () => {
-          this.loadingDone();
+          // this.loadingDone();
         },
         // On error
         (err) => this.handleConnectionError(err)
       );
 
-    return this.isLoading();
+    return of(true);
   }
 
   /**
@@ -194,32 +196,12 @@ export class LocalUserService extends LoadingService {
   }
 
   /**
-   * Delete an user form the DB
-   *
-   * @param userToDelete User to be deleted
-   */
-  private removeUserOnLocalStorage(userToDelete: LocalUser): Observable<any> {
-    // Make a clone of the users and remove the user
-    const localUsers = this.users.filter((user: LocalUser) => user.id !== userToDelete.id);
-
-    // Save the array with the user removed on local storage
-    return this.localStorageService.setItem('users', localUsers).pipe(
-      // If everything goes well assign the array of users with the user removed to the original array
-      tap(() => {
-        // Quit all the users
-        this.users.splice(0, this.users.length);
-        // Push the new ones
-        this.users.push(...localUsers);
-      }));
-  }
-
-  /**
    * What to do when a connection error happen
    *
    * @param err The error triggered
    */
   private handleConnectionError(err: any) {
-    this.loading.error(err);
-    this.loadingDone();
+    /* this.loading.error(err);
+    this.loadingDone(); */
   }
 }
