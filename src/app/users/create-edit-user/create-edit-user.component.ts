@@ -1,10 +1,17 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { NgForm, FormGroupDirective, FormControl, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 
 import { MatDialogRef } from '@angular/material/dialog';
 
-import { MatDatepickerInputEvent, MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
-import { switchMap, filter } from 'rxjs/operators';
+import { MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
+import { switchMap } from 'rxjs/operators';
 
 import { LocalUser } from '../shared/models/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
@@ -13,48 +20,6 @@ import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { AppState, selectLocalUsersLoadingCUD } from '../../store';
 import { CreateLocalUser } from '../../store/local-users/actions';
-
-/**
- * Contains all the Form Controls Validators
- */
-class FormControlValidators {
-  /**
-   * Control the emails errors
-   */
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email
-  ]);
-
-  /**
-   * Control the names errors
-   */
-  firstNameFormControl = new FormControl('', [
-    Validators.required,
-    Validators.pattern(/^.*(.*\w){2,}.*$/),
-  ]);
-
-  /**
-   * Control the names errors
-   */
-  secondNameFormControl = new FormControl('', [
-    Validators.required,
-    Validators.pattern(/^.*(.*\w){2,}.*$/),
-  ]);
-
-  /**
-   * Control the names errors
-   */
-  phoneFormControl = new FormControl('', [
-    Validators.required,
-    Validators.pattern(/^\d{9,15}$/),
-  ]);
-
-  /**
-   * Match errors
-   */
-  matcher = new MyErrorStateMatcher();
-}
 
 /** Error when invalid control is dirty, touched, or submitted. */
 class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -69,7 +34,14 @@ class MyErrorStateMatcher implements ErrorStateMatcher {
   templateUrl: './create-edit-user.component.html',
   styleUrls: ['./create-edit-user.component.scss'],
 })
-export class CreateEditUserComponent extends FormControlValidators implements OnInit {
+export class CreateEditUserComponent implements OnInit {
+
+  /**
+   * Match errors
+   */
+  matcher: MyErrorStateMatcher;
+
+  myForm: FormGroup;
 
   /**
    * Indicate whether the modal is editing or creating a user
@@ -109,12 +81,11 @@ export class CreateEditUserComponent extends FormControlValidators implements On
   constructor(
     @Inject(MAT_DIALOG_DATA) public userToEdit: any,
     public dialogRef: MatDialogRef<CreateEditUserComponent>,
+    private fb: FormBuilder,
     private localUserService: LocalUserService,
     private snackBar: MatSnackBar,
     private store: Store<AppState>
   ) {
-    super();
-
     this.loading = this.store.pipe(select(selectLocalUsersLoadingCUD));
 
     // Set the start dates
@@ -134,9 +105,41 @@ export class CreateEditUserComponent extends FormControlValidators implements On
       this.user = this.userToEdit;
       this.onEdit = true;
     }
+
+    this.matcher = new MyErrorStateMatcher();
   }
 
   ngOnInit() {
+    this.myForm = this.fb.group({
+      /**
+     * Control the emails errors
+     */
+      email: [
+        '',
+        [Validators.required, Validators.email]
+      ],
+      /**
+       * Control the names errors
+       */
+      firstName: [
+        '',
+        [Validators.required, Validators.pattern(/^.*(.*\w){2,}.*$/)]
+      ],
+      /**
+       * Control the names errors
+       */
+      secondName: [
+        '',
+        [Validators.required, Validators.pattern(/^.*(.*\w){2,}.*$/)]
+      ],
+      /**
+       * Control the names errors
+       */
+      phone: [
+        '',
+        [Validators.required, Validators.pattern(/^\d{9,15}$/)]
+      ]
+    });
   }
 
   /**
