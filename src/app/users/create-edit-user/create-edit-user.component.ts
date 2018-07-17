@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
   FormGroupDirective,
   NgForm,
-  Validators,
+  Validators
 } from '@angular/forms';
 
 import { MatDialogRef } from '@angular/material/dialog';
@@ -37,21 +38,27 @@ class MyErrorStateMatcher implements ErrorStateMatcher {
 export class CreateEditUserComponent implements OnInit {
 
   /**
+   * Reference to the form
+   */
+  @ViewChild('userForm') userForm: NgForm;
+
+  /**
    * Match errors
    */
   matcher: MyErrorStateMatcher;
 
+  /**
+   * Group of validations to validate the form
+   *
+   * @type {FormGroup}
+   * @memberof CreateEditUserComponent
+   */
   myForm: FormGroup;
 
   /**
    * Indicate whether the modal is editing or creating a user
    */
   onEdit: boolean;
-
-  /**
-   * Reference to the form
-   */
-  @ViewChild('userForm') userForm: NgForm;
 
   /**
    * The start date of the date picker
@@ -116,7 +123,7 @@ export class CreateEditUserComponent implements OnInit {
      */
       email: [
         '',
-        [Validators.required, Validators.email]
+        [Validators.required, Validators.email, this.validateEmail.bind(this)],
       ],
       /**
        * Control the names errors
@@ -233,5 +240,20 @@ export class CreateEditUserComponent implements OnInit {
           });
         },
       );
+  }
+
+  /**
+   * A function to validate if the email already exits among
+   * the existing users
+   *
+   * @private
+   * @param {AbstractControl} control
+   * @returns null | { duplicate: true }
+   * @memberof CreateEditUserComponent
+   */
+  private validateEmail(control: AbstractControl) {
+    const hasError = this.localUserService.doesEmailExists(control.value);
+
+    return hasError ? { duplicate: true } : null;
   }
 }

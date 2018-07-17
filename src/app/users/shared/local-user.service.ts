@@ -169,7 +169,7 @@ export class LocalUserService {
    * @returns {boolean} True - some user already have that email
    *                    False - no one has it
    */
-  private theEmailExists(emailToCheck) {
+  doesEmailExists(emailToCheck: string) {
     // return true; // useful to debug
     return this.users
       // Pass only the email of the local users
