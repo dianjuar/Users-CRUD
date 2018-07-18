@@ -59,6 +59,11 @@ export const selectLocalUserCreated = createSelector(
   (state: LocalUsersState) => state.userCreated
 );
 
+export const selectLocalUserUpdated = createSelector(
+  selectLocalUsersFeature,
+  (state: LocalUsersState) => state.userUpdated
+);
+
 export const selectLocalUserDeleted = createSelector(
   selectLocalUsersFeature,
   (state: LocalUsersState) => state.userDeleted

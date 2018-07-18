@@ -5,12 +5,11 @@ import { MatTableDataSource, MatTable, MatDialog, MatSnackBar, MatDialogRef } fr
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
 import { CreateEditUserComponent } from '../create-edit-user/create-edit-user.component';
 
-import { LocalUserService } from '../shared/local-user.service';
 import { LocalUser } from '../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers, selectLocalUsersLoadingReading, selectLocalUserDeleted } from '../../store';
+import { AppState, selectLocalUsers, selectLocalUsersLoadingReading, selectLocalUserDeleted, selectLocalUserUpdated } from '../../store';
 import { ReadLocalUsers } from '../../store/local-users/actions';
 import { filter } from 'rxjs/operators';
 
@@ -75,7 +74,6 @@ export class LocalUsersComponent implements OnInit {
   private dialogRef: MatDialogRef<CreateEditUserComponent | DeleteConfirmationComponent>;
 
   constructor(
-    private localUserService: LocalUserService,
     private snackBar: MatSnackBar,
     private store: Store<AppState>,
     private dialog: MatDialog
@@ -90,7 +88,7 @@ export class LocalUsersComponent implements OnInit {
 
     this.store.dispatch(new ReadLocalUsers());
 
-    // Subscribe to user created information to indicate
+    // Subscribe to user created to close the modal and launch a toast to give feedback
     this.store.pipe(
       select(selectLocalUserDeleted),
       // Ignore undefined values
@@ -102,6 +100,22 @@ export class LocalUsersComponent implements OnInit {
 
         // Show a snack bar to indicate the operation
         this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
+          duration: 2000,
+        });
+      });
+
+    // Subscribe to user updated to close the modal and launch a toast to give feedback
+    this.store.pipe(
+      select(selectLocalUserUpdated),
+      // Ignore undefined values
+      filter(userUpdated => !!userUpdated)
+    )
+      .subscribe((userUpdated: LocalUser) => {
+        // Close the modal
+        this.dialogRef.close();
+
+        // Show a snack bar to indicate the operation
+        this.snackBar.open('User Updated Successfully', 'GOT IT!', {
           duration: 2000,
         });
       });
@@ -142,44 +156,6 @@ export class LocalUsersComponent implements OnInit {
     this.dialogRef = this.dialog.open(DeleteConfirmationComponent, {
       data: user
     });
-
-    // what to do if the user says "YES I WANT DELETE"
-    /* const deleteUserFun = (userToDelete: LocalUser) => {
-      if (userToDelete) {
-        // Indicate that we are loading
-        // this.loading = true;
-
-        // Delete user
-        this.localUserService.deleteUser(userToDelete)
-          // On success update table and display a notification
-          .subscribe(
-            // Completed successfully
-            () => {
-              // this.loading = false;
-              this.updateRows();
-              // Show a snack bar to indicate the operation
-
-            },
-            // On error
-             (err) => {
-              // this.loading = false;
-              // Indicate the error
-              const snackRef = this.snackBar.open('Connection Error', 'RETRY', {
-                duration: 10000
-              });
-
-              // If the user clicks on retry call the function again to make the request
-              snackRef.onAction()
-                .subscribe(
-                  () => {
-                    // Call itself to repeat the process
-                    deleteUserFun(userToDelete);
-                  }
-                );
-            }
-          );
-        }
-    }; */
   }
 
   /**
@@ -187,26 +163,21 @@ export class LocalUsersComponent implements OnInit {
    * @param user
    */
   editUser(user: LocalUser) {
-    const dialogRef = this.dialog.open(CreateEditUserComponent, {
+    this.dialogRef = this.dialog.open(CreateEditUserComponent, {
       width: '50%',
       maxWidth: '500px',
       minWidth: '344px',
-      data: Object.assign(LocalUser.initEmptyUser(), user) as LocalUser
+      data: new LocalUser(user)
     });
-
-    // When the dialog closes, update the rows, probably a new user was edited
-    dialogRef.afterClosed().subscribe(
-      () => this.updateRows()
-    );
   }
 
   /**
    * Function to overwrite the custom filtering Material Table
    *
    * @param data localUser to filter
-   * @param filter The string to search for
+   * @param criteria The string to search for
    */
-  private filterByEmail(data: LocalUser, filter: string): boolean {
-    return data.email.search(filter) !== -1;
+  private filterByEmail(data: LocalUser, criteria: string): boolean {
+    return data.email.search(criteria) !== -1;
   }
 }

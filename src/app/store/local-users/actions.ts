@@ -7,6 +7,9 @@ export const CREATE_LOCAL_USER_SUCCESS = '[Local Users] Create Success';
 export const READ_LOCAL_USERS = '[Local Users] Read';
 export const READ_LOCAL_USERS_SUCCESS = '[Local Users] Read Success';
 
+export const UPDATE_LOCAL_USER = '[Local Users] Update';
+export const UPDATE_LOCAL_USER_SUCCESS = '[Local Users] Update Success';
+
 export const DELETE_LOCAL_USER = '[Local Users] Delete';
 export const DELETE_LOCAL_USER_SUCCESS = '[Local Users] Delete Success';
 
@@ -14,7 +17,7 @@ export const DELETE_LOCAL_USER_SUCCESS = '[Local Users] Delete Success';
  * Action to create an user
  *
  * @export
- * @class Class
+ * @class CreateLocalUser
  * @implements {Action}
  */
 export class CreateLocalUser implements Action {
@@ -28,7 +31,7 @@ export class CreateLocalUser implements Action {
  * successfully
  *
  * @export
- * @class Class
+ * @class CreateLocalUserSuccess
  * @implements {Action}
  */
 export class CreateLocalUserSuccess implements Action {
@@ -64,7 +67,34 @@ export class ReadLocalUsersSuccess implements Action {
 }
 
 /**
- * Action to read users from the local storage
+ * Action to update an user
+ *
+ * @export
+ * @class UpdateLocalUser
+ * @implements {Action}
+ */
+export class UpdateLocalUser implements Action {
+  readonly type = UPDATE_LOCAL_USER;
+
+  constructor(public payload: LocalUser) { }
+}
+
+/**
+ * Action to indicate that the user update finish
+ * successfully
+ *
+ * @export
+ * @class UpdateLocalUserSuccess
+ * @implements {Action}
+ */
+export class UpdateLocalUserSuccess implements Action {
+  readonly type = UPDATE_LOCAL_USER_SUCCESS;
+
+  constructor(public payload: ModifiedLocalUserSuccessPayloadModel) { }
+}
+
+/**
+ * Action to delete users from the local storage
  *
  * @export
  * @class ReadLocalUsers
@@ -76,22 +106,22 @@ export class DeleteLocalUser implements Action {
   constructor(public payload: LocalUser) { }
 }
 
-
-export interface DeleteLocalUserSuccessPayloadModel {
-  deletedUser: LocalUser;
-  users: Array<LocalUser>;
-}
 /**
  * Action to set read users from local storage in the state
  *
  * @export
- * @class ReadLocalUsersSuccess
+ * @class DeleteLocalUserSuccess
  * @implements {Action}
  */
 export class DeleteLocalUserSuccess implements Action {
   readonly type = DELETE_LOCAL_USER_SUCCESS;
 
-  constructor(public payload: DeleteLocalUserSuccessPayloadModel) { }
+  constructor(public payload: ModifiedLocalUserSuccessPayloadModel) { }
+}
+
+export interface ModifiedLocalUserSuccessPayloadModel {
+  modifiedUser: LocalUser;
+  users: Array<LocalUser>;
 }
 
 export type All =
@@ -99,5 +129,7 @@ export type All =
   CreateLocalUserSuccess |
   ReadLocalUsers |
   ReadLocalUsersSuccess |
+  UpdateLocalUser |
+  UpdateLocalUserSuccess |
   DeleteLocalUser |
   DeleteLocalUserSuccess;

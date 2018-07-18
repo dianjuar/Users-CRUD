@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { of, throwError,  Observable } from 'rxjs';
-import { map, timeout, reduce, tap, retry, switchMap, toArray } from 'rxjs/operators';
+import { of,  Observable } from 'rxjs';
+import { map, timeout, retry, switchMap, toArray } from 'rxjs/operators';
 
 import { LocalUser } from '../shared/models/local-user.model';
 
+import { AppState, selectLocalUsers } from '../../store';
+import { ModifiedLocalUserSuccessPayloadModel } from '../../store/local-users/actions';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers } from '../../store';
-import { DeleteLocalUserSuccessPayloadModel } from '../../store/local-users/actions';
-
 
 @Injectable()
 export class LocalUserService {
@@ -45,15 +44,6 @@ export class LocalUserService {
    * @returns {Observable<boolean>} The observable with created user
    */
   saveUser(user: LocalUser): Observable<boolean> {
-    // Verify if the email already exits
-    /* if (this.theEmailExists(user.email)) {
-      this.loadingDone();
-      return observableThrowError({
-        type: 'duplicateEmail',
-        message: 'the email already exits'
-      });
-    } */
-
     return this.http.post(this.usersEndpoint, { }).pipe(
       // give it 3seconds to make the operation
       timeout(3000),
@@ -81,9 +71,9 @@ export class LocalUserService {
    * Delete a user from local storage
    *
    * @param userToDelete User to Delete
-   * @returns {Observable<DeleteLocalUserSuccessPayloadModel>}
+   * @returns {Observable<ModifiedLocalUserSuccessPayloadModel>}
    */
-  deleteUser(userToDelete: LocalUser): Observable<DeleteLocalUserSuccessPayloadModel> {
+  deleteUser(userToDelete: LocalUser): Observable<ModifiedLocalUserSuccessPayloadModel> {
     let newUsersArray: Array<LocalUser>;
 
     return this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {}).pipe(
@@ -99,17 +89,11 @@ export class LocalUserService {
         // Save the array with the user removed on local storage
         return this.localStorageService.setItem('users', newUsersArray);
       }),
-      map(() => <DeleteLocalUserSuccessPayloadModel>{
-        deletedUser: userToDelete,
+      map(() => <ModifiedLocalUserSuccessPayloadModel>{
+        modifiedUser: userToDelete,
         users: newUsersArray
       })
     );
-      /* .subscribe(
-        () => {
-          // this.loadingDone();
-        },
-        (err) => this.handleConnectionError(err)
-      ); */
   }
 
   /**
@@ -117,14 +101,12 @@ export class LocalUserService {
    *
    * @param userToUpdate User to Delete
    *
-   * @returns {Observable<boolean>}
-   *          To subscribe and know it finish. In case the email already exits
-   *          will throw an observable error
+   * @returns {Observable<ModifiedLocalUserSuccessPayloadModel>}
    */
-  updateUser(userToUpdate: LocalUser): Observable<boolean> {
-    // this.imLoading();
+  updateUser(userToUpdate: LocalUser): Observable<ModifiedLocalUserSuccessPayloadModel> {
+    let newUsersArray: Array<LocalUser>;
 
-    this.http.put(this.usersEndpoint, {}).pipe(
+    return this.http.put(this.usersEndpoint, {}).pipe(
       // give it 3seconds to make the operation
       timeout(3000),
       // Retry the operation 3 times on error
@@ -134,17 +116,20 @@ export class LocalUserService {
         // Update updated at date
         userToUpdate.setUpdatedAt(resp.updatedAt);
 
-        return this.updateOnLocalStorage(userToUpdate);
-      }))
-      .subscribe(
-        () => {
-          // this.loadingDone();
-        },
-        // On error
-        (err) => this.handleConnectionError(err)
-      );
+        // Get the index of the user to be edited
+        const index = this.users.findIndex((user: LocalUser) => user.id === userToUpdate.id);
 
-    return of(true);
+        newUsersArray = [...this.users];
+        newUsersArray[index] = userToUpdate;
+
+        // Update on local storage
+        return this.localStorageService.setItem('users', newUsersArray);
+      }),
+      map(() => <ModifiedLocalUserSuccessPayloadModel>{
+        modifiedUser: userToUpdate,
+        users: newUsersArray
+      })
+    );
   }
 
   /**
@@ -176,23 +161,6 @@ export class LocalUserService {
       .map((localUser: LocalUser) => localUser.email)
       // Filter only the email
       .some((userEmail) => userEmail === emailToCheck);
-  }
-
-  /**
-   * Update on local storage the given user
-   * Try to update it, if goes well push in the array
-   *
-   * @param userUpdated The user to update in the local storage
-   */
-  private updateOnLocalStorage(userUpdated: LocalUser): Observable<boolean> {
-
-    // Get the index of the user to be edited
-    const index = this.users.findIndex((user: LocalUser) => user.id === userUpdated.id);
-
-    this.users[index] = userUpdated;
-
-    // Update on local storage
-    return this.localStorageService.setItem('users', this.users);
   }
 
   /**

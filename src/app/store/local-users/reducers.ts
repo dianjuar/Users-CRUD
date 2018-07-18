@@ -20,6 +20,7 @@ export interface LocalUsersState {
    */
   loadingReading: boolean;
   userCreated?: LocalUser;
+  userUpdated?: LocalUser;
   userDeleted?: LocalUser;
 }
 
@@ -67,6 +68,23 @@ export function localUserReducer(
       };
     }
 
+    case LocalUserActions.UPDATE_LOCAL_USER: {
+      return {
+        ...state,
+        loadingCUD: true
+      };
+    }
+
+    case LocalUserActions.UPDATE_LOCAL_USER_SUCCESS: {
+      const payload = (action as LocalUserActions.UpdateLocalUserSuccess).payload;
+      return {
+        ...state,
+        loadingCUD: false,
+        userUpdated: payload.modifiedUser,
+        users: payload.users
+      };
+    }
+
     case LocalUserActions.DELETE_LOCAL_USER: {
       return {
         ...state,
@@ -80,7 +98,7 @@ export function localUserReducer(
         ...state,
         loadingCUD: false,
         users: payload.users,
-        userDeleted: payload.deletedUser
+        userDeleted: payload.modifiedUser
       };
     }
 

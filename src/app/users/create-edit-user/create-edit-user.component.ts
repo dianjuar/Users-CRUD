@@ -20,7 +20,7 @@ import { LocalUserService } from '../shared/local-user.service';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { AppState, selectLocalUsersLoadingCUD } from '../../store';
-import { CreateLocalUser } from '../../store/local-users/actions';
+import { CreateLocalUser, UpdateLocalUser } from '../../store/local-users/actions';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -186,39 +186,14 @@ export class CreateEditUserComponent implements OnInit {
    */
   private saveNewUser() {
     this.store.dispatch(new CreateLocalUser(this.user));
-
-
-
-      // When the modal is closed....
-      /* .subscribe(
-        // next
-        () => {
-        },
-        // error
-        (err) => {
-          // If the err is because the email is duplicate
-          if (err.type === 'duplicateEmail') {
-            console.log('error', err);
-            this.loading = false;
-            this.emailFormControl.setErrors({ duplicate: true});
-          } else {
-            console.log('error', err);
-            this.loading = false;
-
-            // Indicate the error
-            const snackRef = this.snackBar.open('Connection Error', null, {
-              duration: 10000
-            });
-          }
-        }
-      );*/
   }
 
   /**
    * Update the current edited user
    */
   private updateUser() {
-    this.localUserService.updateUser(this.user).pipe(
+    this.store.dispatch( new UpdateLocalUser(this.user));
+    /* this.localUserService.updateUser(this.user).pipe(
       // Close the modal on success
       switchMap(() => this.closeModal()))
       // When the modal is closed....
@@ -239,7 +214,7 @@ export class CreateEditUserComponent implements OnInit {
             duration: 10000
           });
         },
-      );
+      );*/
   }
 
   /**
@@ -252,6 +227,11 @@ export class CreateEditUserComponent implements OnInit {
    * @memberof CreateEditUserComponent
    */
   private validateEmail(control: AbstractControl) {
+    // if we are editing don't make this validation
+    if (this.onEdit) {
+      return null;
+    }
+
     const hasError = this.localUserService.doesEmailExists(control.value);
 
     return hasError ? { duplicate: true } : null;

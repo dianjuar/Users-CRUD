@@ -17,7 +17,10 @@ import {
   DELETE_LOCAL_USER,
   DeleteLocalUser,
   DeleteLocalUserSuccess,
-  DeleteLocalUserSuccessPayloadModel,
+  ModifiedLocalUserSuccessPayloadModel,
+  UpdateLocalUser,
+  UPDATE_LOCAL_USER,
+  UpdateLocalUserSuccess,
 } from './actions';
 
 
@@ -48,6 +51,18 @@ export class LocalUsersEffects {
     )
   );
 
+  // Listen for the 'UPDATE_LOCAL_USERS' action
+  @Effect()
+  updateUsersFromLocal$: Observable<Action> = this.actions$.pipe(
+    ofType(UPDATE_LOCAL_USER),
+    mergeMap((action: UpdateLocalUser) =>
+      this.localUserService.updateUser(action.payload).pipe(
+        // If successful, dispatch success action with result
+        map((updateUserResult: ModifiedLocalUserSuccessPayloadModel) => new UpdateLocalUserSuccess(updateUserResult)),
+      )
+    )
+  );
+
   // Listen for the 'READ_LOCAL_USERS' action
   @Effect()
   deleteUserFromLocal$: Observable<Action> = this.actions$.pipe(
@@ -55,7 +70,7 @@ export class LocalUsersEffects {
     mergeMap((action: DeleteLocalUser) =>
       this.localUserService.deleteUser(action.payload).pipe(
         // If successful, dispatch success action with result
-        map((deleteUserResult: DeleteLocalUserSuccessPayloadModel) => new DeleteLocalUserSuccess(deleteUserResult)),
+        map((deleteUserResult: ModifiedLocalUserSuccessPayloadModel) => new DeleteLocalUserSuccess(deleteUserResult)),
       )
     )
   );
