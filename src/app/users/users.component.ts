@@ -7,8 +7,10 @@ import { filter } from 'rxjs/operators';
 
 import { MatDialog, MatDialogRef, MatTabGroup, MatSnackBar } from '@angular/material';
 
-import { AppState, selectLocalUserCreated } from '../store';
+import { AppState, selectLocalUserCUDSuccess } from '../store';
 import { Store, select } from '@ngrx/store';
+import { CUDSuccessState } from '../store/local-users/reducers';
+import { CUDSuccessActions } from '../store/local-users/actions';
 
 @Component({
   selector: 'app-users',
@@ -33,13 +35,13 @@ export class UsersComponent implements OnInit {
     private store: Store<AppState>,
     private snackBar: MatSnackBar,
   ) {
-    // Subscribe to user created information to indicate
+    // Subscribe to user created to close the modal and launch a toast to give feedback
     this.store.pipe(
-      select(selectLocalUserCreated),
+      select(selectLocalUserCUDSuccess),
       // Ignore undefined values
-      filter(userCreated => !!userCreated)
+      filter(userCUD => !!userCUD && userCUD.onAction === CUDSuccessActions.Create),
     )
-      .subscribe((userCreated: LocalUser) => {
+      .subscribe((userCUD: CUDSuccessState) => {
         // Close the modal
         this.dialogRef.close();
 

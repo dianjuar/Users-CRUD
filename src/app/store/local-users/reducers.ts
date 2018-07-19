@@ -19,9 +19,13 @@ export interface LocalUsersState {
    * @memberof LocalUsersState
    */
   loadingReading: boolean;
-  userCreated?: LocalUser;
-  userUpdated?: LocalUser;
-  userDeleted?: LocalUser;
+  /**
+   *
+   *
+   * @type {CUDSuccess}
+   * @memberof LocalUsersState
+   */
+  userCUDSuccess?: CUDSuccessState;
   /**
    * To indicate that an error occur when Creating, Updating or Deleting
    *
@@ -29,6 +33,11 @@ export interface LocalUsersState {
    * @memberof LocalUsersState
    */
   userCUDFailed?: boolean;
+}
+
+export interface CUDSuccessState {
+  onAction: LocalUserActions.CUDSuccessActions;
+  CUDUser: LocalUser;
 }
 
 export const initialLocalUsersState: LocalUsersState = {
@@ -49,15 +58,6 @@ export function localUserReducer(
         ...state,
         loadingCUD: true,
         userCUDFailed: false
-      };
-    }
-
-    case LocalUserActions.CREATE_LOCAL_USER_SUCCESS: {
-      return {
-        ...state,
-        loadingCUD: false,
-        users: [ ...state.users, action.payload ],
-        userCreated: action.payload
       };
     }
 
@@ -84,16 +84,6 @@ export function localUserReducer(
       };
     }
 
-    case LocalUserActions.UPDATE_LOCAL_USER_SUCCESS: {
-      const payload = (action as LocalUserActions.UpdateLocalUserSuccess).payload;
-      return {
-        ...state,
-        loadingCUD: false,
-        userUpdated: payload.modifiedUser,
-        users: payload.users
-      };
-    }
-
     case LocalUserActions.DELETE_LOCAL_USER: {
       return {
         ...state,
@@ -102,13 +92,15 @@ export function localUserReducer(
       };
     }
 
-    case LocalUserActions.DELETE_LOCAL_USER_SUCCESS: {
-      const payload = (action as LocalUserActions.DeleteLocalUserSuccess).payload;
+    case LocalUserActions.CUD_LOCAL_USER_SUCCESS: {
       return {
         ...state,
         loadingCUD: false,
-        users: payload.users,
-        userDeleted: payload.modifiedUser
+        users: [...action.payload.users],
+        userCUDSuccess: {
+          CUDUser: action.payload.CUDUser,
+          onAction: action.payload.CUDAction
+        }
       };
     }
 

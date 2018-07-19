@@ -55,19 +55,9 @@ export const selectLocalUsers = createSelector(
   (state: LocalUsersState) => state.users
 );
 
-export const selectLocalUserCreated = createSelector(
+export const selectLocalUserCUDSuccess = createSelector(
   selectLocalUsersFeature,
-  (state: LocalUsersState) => state.userCreated
-);
-
-export const selectLocalUserUpdated = createSelector(
-  selectLocalUsersFeature,
-  (state: LocalUsersState) => state.userUpdated
-);
-
-export const selectLocalUserDeleted = createSelector(
-  selectLocalUsersFeature,
-  (state: LocalUsersState) => state.userDeleted
+  (state: LocalUsersState) => state.userCUDSuccess
 );
 
 export const selectLocalUserCUDFailed = createSelector(

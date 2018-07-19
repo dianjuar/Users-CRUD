@@ -7,7 +7,7 @@ import { map, timeout, retry, switchMap, toArray } from 'rxjs/operators';
 import { LocalUser } from '../shared/models/local-user.model';
 
 import { AppState, selectLocalUsers } from '../../store';
-import { ModifiedLocalUserSuccessPayloadModel } from '../../store/local-users/actions';
+import { CUDLocalUserSuccessPayloadModel, CUDSuccessActions } from '../../store/local-users/actions';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Store, select } from '@ngrx/store';
 
@@ -41,9 +41,9 @@ export class LocalUserService {
    * storage
    *
    * @param user The user to save
-   * @returns {Observable<boolean>} The observable with created user
+   * @returns {Observable<CUDLocalUserSuccessPayloadModel>}
    */
-  saveUser(user: LocalUser): Observable<boolean> {
+  saveUser(user: LocalUser): Observable<CUDLocalUserSuccessPayloadModel> {
     return this.http.post(this.usersEndpoint, { }).pipe(
       // give it 3seconds to make the operation
       timeout(3000),
@@ -63,6 +63,11 @@ export class LocalUserService {
 
         // Save on local storage
         return this.localStorageService.setItem('users', localUsers);
+      }),
+      map(() => <CUDLocalUserSuccessPayloadModel>{
+        CUDUser: user,
+        CUDAction: CUDSuccessActions.Create,
+        users: [ ...this.users, user ]
       })
     );
   }
@@ -71,9 +76,9 @@ export class LocalUserService {
    * Delete a user from local storage
    *
    * @param userToDelete User to Delete
-   * @returns {Observable<ModifiedLocalUserSuccessPayloadModel>}
+   * @returns {Observable<CUDLocalUserSuccessPayloadModel>}
    */
-  deleteUser(userToDelete: LocalUser): Observable<ModifiedLocalUserSuccessPayloadModel> {
+  deleteUser(userToDelete: LocalUser): Observable<CUDLocalUserSuccessPayloadModel> {
     let newUsersArray: Array<LocalUser>;
 
     return this.http.delete(`${this.usersEndpoint}${userToDelete.id}`, {}).pipe(
@@ -89,8 +94,9 @@ export class LocalUserService {
         // Save the array with the user removed on local storage
         return this.localStorageService.setItem('users', newUsersArray);
       }),
-      map(() => <ModifiedLocalUserSuccessPayloadModel>{
-        modifiedUser: userToDelete,
+      map(() => <CUDLocalUserSuccessPayloadModel>{
+        CUDUser: userToDelete,
+        CUDAction: CUDSuccessActions.Delete,
         users: newUsersArray
       })
     );
@@ -101,9 +107,9 @@ export class LocalUserService {
    *
    * @param userToUpdate User to Delete
    *
-   * @returns {Observable<ModifiedLocalUserSuccessPayloadModel>}
+   * @returns {Observable<CUDLocalUserSuccessPayloadModel>}
    */
-  updateUser(userToUpdate: LocalUser): Observable<ModifiedLocalUserSuccessPayloadModel> {
+  updateUser(userToUpdate: LocalUser): Observable<CUDLocalUserSuccessPayloadModel> {
     let newUsersArray: Array<LocalUser>;
 
     return this.http.put(this.usersEndpoint, {}).pipe(
@@ -125,8 +131,9 @@ export class LocalUserService {
         // Update on local storage
         return this.localStorageService.setItem('users', newUsersArray);
       }),
-      map(() => <ModifiedLocalUserSuccessPayloadModel>{
-        modifiedUser: userToUpdate,
+      map(() => <CUDLocalUserSuccessPayloadModel>{
+        CUDUser: userToUpdate,
+        CUDAction: CUDSuccessActions.Update,
         users: newUsersArray
       })
     );

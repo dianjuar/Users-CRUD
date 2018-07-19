@@ -12,13 +12,13 @@ import { Store, select } from '@ngrx/store';
 import {
   AppState,
   selectLocalUserCUDFailed,
-  selectLocalUserDeleted,
-  selectLocalUserUpdated,
+  selectLocalUserCUDSuccess,
   selectLocalUsers,
   selectLocalUsersLoadingReading
 } from '../../store';
-import { ReadLocalUsers } from '../../store/local-users/actions';
+import { ReadLocalUsers, CUDSuccessActions } from '../../store/local-users/actions';
 import { filter } from 'rxjs/operators';
+import { CUDSuccessState } from '../../store/local-users/reducers';
 
 @Component({
   selector: 'app-local-users',
@@ -97,32 +97,29 @@ export class LocalUsersComponent implements OnInit {
 
     // Subscribe to user created to close the modal and launch a toast to give feedback
     this.store.pipe(
-      select(selectLocalUserDeleted),
+      select(selectLocalUserCUDSuccess),
       // Ignore undefined values
-      filter(userDeleted => !!userDeleted)
+      filter(userCUD => !!userCUD && userCUD.onAction !== CUDSuccessActions.Create)
     )
-      .subscribe((userDeleted: LocalUser) => {
+      .subscribe((userCUD: CUDSuccessState) => {
         // Close the modal
         this.dialogRef.close();
 
-        // Show a snack bar to indicate the operation
-        this.snackBar.open('User Deleted Successfully', 'GOT IT!', {
-          duration: 2000,
-        });
-      });
+        let verb: string;
 
-    // Subscribe to user updated to close the modal and launch a toast to give feedback
-    this.store.pipe(
-      select(selectLocalUserUpdated),
-      // Ignore undefined values
-      filter(userUpdated => !!userUpdated)
-    )
-      .subscribe((userUpdated: LocalUser) => {
-        // Close the modal
-        this.dialogRef.close();
+        switch (userCUD.onAction) {
+
+          case CUDSuccessActions.Update:
+            verb = 'Updated';
+          break;
+
+          case CUDSuccessActions.Delete:
+            verb = 'Deleted';
+            break;
+        }
 
         // Show a snack bar to indicate the operation
-        this.snackBar.open('User Updated Successfully', 'GOT IT!', {
+        this.snackBar.open(`User ${verb} Successfully`, 'GOT IT!', {
           duration: 2000,
         });
       });

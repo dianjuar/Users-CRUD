@@ -10,17 +10,15 @@ import { LocalUserService } from '../../users/shared/local-user.service';
 import {
   CREATE_LOCAL_USER,
   CreateLocalUser,
-  CreateLocalUserSuccess,
+  CUDLocalUserSuccess,
   READ_LOCAL_USERS,
   ReadLocalUsers,
   ReadLocalUsersSuccess,
   DELETE_LOCAL_USER,
   DeleteLocalUser,
-  DeleteLocalUserSuccess,
-  ModifiedLocalUserSuccessPayloadModel,
+  CUDLocalUserSuccessPayloadModel,
   UpdateLocalUser,
   UPDATE_LOCAL_USER,
-  UpdateLocalUserSuccess,
   CUDLocalUserFailed,
 } from './actions';
 
@@ -34,7 +32,7 @@ export class LocalUsersEffects {
     mergeMap((action: CreateLocalUser) =>
       this.localUserService.saveUser(action.payload).pipe(
         // If successful, dispatch success action with the user created
-        map(() => new CreateLocalUserSuccess(action.payload)),
+        map((payload: CUDLocalUserSuccessPayloadModel) => new CUDLocalUserSuccess(payload)),
         catchError(() => of(new CUDLocalUserFailed()))
       )
     )
@@ -59,7 +57,7 @@ export class LocalUsersEffects {
     mergeMap((action: UpdateLocalUser) =>
       this.localUserService.updateUser(action.payload).pipe(
         // If successful, dispatch success action with result
-        map((updateUserResult: ModifiedLocalUserSuccessPayloadModel) => new UpdateLocalUserSuccess(updateUserResult)),
+        map((updateUserResult: CUDLocalUserSuccessPayloadModel) => new CUDLocalUserSuccess(updateUserResult)),
         catchError(() => of(new CUDLocalUserFailed()))
       )
     )
@@ -72,7 +70,7 @@ export class LocalUsersEffects {
     mergeMap((action: DeleteLocalUser) =>
       this.localUserService.deleteUser(action.payload).pipe(
         // If successful, dispatch success action with result
-        map((deleteUserResult: ModifiedLocalUserSuccessPayloadModel) => new DeleteLocalUserSuccess(deleteUserResult)),
+        map((deleteUserResult: CUDLocalUserSuccessPayloadModel) => new CUDLocalUserSuccess(deleteUserResult)),
         catchError(() => of(new CUDLocalUserFailed()))
       )
     )
