@@ -1,5 +1,5 @@
 import * as ApiUserActions from './actions';
-import { ApiUser, ApiUserResponse, Pagination } from '../../users/shared/api-user.model';
+import { ApiUser, ApiUserResponse, Pagination } from '../../users/shared/models/api-user.model';
 
 export interface ApiUsersState {
   /**
@@ -42,7 +42,6 @@ export const initialApiUsersState: ApiUsersState = {
 };
 
 export function apiUsersReducer(state = initialApiUsersState, action: ApiUserActions.All): ApiUsersState {
-
   switch (action.type) {
     case ApiUserActions.FETCH_USERS_API: {
       return {

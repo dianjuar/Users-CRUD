@@ -17,6 +17,7 @@ import { StoreModule } from '@ngrx/store';
 
 import { ApiUsersEffects } from './store/api-users/effects';
 import { reducers } from './store';
+import { LocalUsersEffects } from './store/local-users/effects';
 
 
 @NgModule({
@@ -35,7 +36,10 @@ import { reducers } from './store';
     // Ngrx
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument(),
-    EffectsModule.forRoot([ApiUsersEffects])
+    EffectsModule.forRoot([
+      ApiUsersEffects,
+      LocalUsersEffects
+    ])
   ],
   providers: [],
   bootstrap: [AppComponent]

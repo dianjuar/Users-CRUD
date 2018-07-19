@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy } from '@angular/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { ApiUser, Pagination } from '../shared/api-user.model';
+import { ApiUser, Pagination } from '../shared/models/api-user.model';
 import { MatSnackBar } from '@angular/material';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -35,7 +35,7 @@ export class ApiUsersComponent implements OnInit, OnDestroy {
   readonly pageSizeOptions: number[] = [2, 3, 4, 5];
 
   /**
-   * Reference for user list that is on the ApiUserService
+   * Api users fetched from the API
    *
    * @type {Observable<Array<ApiUser>>}
    * @memberof ApiUsersComponent
@@ -105,7 +105,6 @@ export class ApiUsersComponent implements OnInit, OnDestroy {
     // Get current page being loaded
     this.paginationSubs = this.pagination.subscribe((pagination: Pagination) => {
       this.currentPagination = pagination;
-
     });
 
     // What to do in case of error

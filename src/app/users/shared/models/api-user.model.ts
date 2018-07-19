@@ -1,3 +1,5 @@
+import { BasicModel } from '../../../shared/basic-model/basic.model';
+
 export interface ApiUserResponse extends Pagination {
   data: ApiUser[];
 }
@@ -59,14 +61,10 @@ export interface ApiUser {
   avatar: string;
 }
 
-export class ApiUser {
+export class ApiUser extends BasicModel<ApiUser> {
 
   constructor(apiUser: ApiUser) {
-    for (const key in apiUser) {
-      if (apiUser.hasOwnProperty(key)) {
-        this[key] = apiUser[key];
-      }
-    }
+    super(apiUser);
   }
 
   /**

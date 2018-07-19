@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ApiUser, ApiUserResponse, Pagination } from './api-user.model';
+import { ApiUser, ApiUserResponse, Pagination } from './models/api-user.model';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { reduce, switchMap, map, tap, retry, timeout, toArray } from 'rxjs/operators';
-
-import { LoadingService } from '../../shared/loading-service';
-
+import { map, tap, retry, timeout } from 'rxjs/operators';
 
 @Injectable()
 export class ApiUserService {

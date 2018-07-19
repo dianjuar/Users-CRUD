@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { ApiUserResponse, Pagination } from '../../users/shared/api-user.model';
+import { ApiUserResponse, Pagination } from '../../users/shared/models/api-user.model';
 
 export const FETCH_USERS_API = '[Api Users] Fetch';
 export const FETCH_USERS_API_SUCCESS = '[Api Users] Fetched';
