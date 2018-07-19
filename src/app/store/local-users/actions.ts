@@ -13,6 +13,8 @@ export const UPDATE_LOCAL_USER_SUCCESS = '[Local Users] Update Success';
 export const DELETE_LOCAL_USER = '[Local Users] Delete';
 export const DELETE_LOCAL_USER_SUCCESS = '[Local Users] Delete Success';
 
+export const CUD_LOCAL_USER_FAILED = '[Local Users] CUD Failed';
+
 /**
  * Action to create an user
  *
@@ -119,6 +121,19 @@ export class DeleteLocalUserSuccess implements Action {
   constructor(public payload: ModifiedLocalUserSuccessPayloadModel) { }
 }
 
+/**
+ * Action to indicate that a CUD error occurred
+ *
+ * @export
+ * @class CUDLocalUserFailed
+ * @implements {Action}
+ */
+export class CUDLocalUserFailed implements Action {
+  readonly type = CUD_LOCAL_USER_FAILED;
+
+  constructor() { }
+}
+
 export interface ModifiedLocalUserSuccessPayloadModel {
   modifiedUser: LocalUser;
   users: Array<LocalUser>;
@@ -132,4 +147,5 @@ export type All =
   UpdateLocalUser |
   UpdateLocalUserSuccess |
   DeleteLocalUser |
-  DeleteLocalUserSuccess;
+  DeleteLocalUserSuccess |
+  CUDLocalUserFailed;

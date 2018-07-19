@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 
-import { Observable } from 'rxjs';
-import { mergeMap, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { mergeMap, map, catchError } from 'rxjs/operators';
 
 import { LocalUserService } from '../../users/shared/local-user.service';
 import {
@@ -21,8 +21,8 @@ import {
   UpdateLocalUser,
   UPDATE_LOCAL_USER,
   UpdateLocalUserSuccess,
+  CUDLocalUserFailed,
 } from './actions';
-
 
 @Injectable()
 export class LocalUsersEffects {
@@ -35,6 +35,7 @@ export class LocalUsersEffects {
       this.localUserService.saveUser(action.payload).pipe(
         // If successful, dispatch success action with the user created
         map(() => new CreateLocalUserSuccess(action.payload)),
+        catchError(() => of(new CUDLocalUserFailed()))
       )
     )
   );
@@ -59,11 +60,12 @@ export class LocalUsersEffects {
       this.localUserService.updateUser(action.payload).pipe(
         // If successful, dispatch success action with result
         map((updateUserResult: ModifiedLocalUserSuccessPayloadModel) => new UpdateLocalUserSuccess(updateUserResult)),
+        catchError(() => of(new CUDLocalUserFailed()))
       )
     )
   );
 
-  // Listen for the 'READ_LOCAL_USERS' action
+  // Listen for the 'DELETE_LOCAL_USERS' action
   @Effect()
   deleteUserFromLocal$: Observable<Action> = this.actions$.pipe(
     ofType(DELETE_LOCAL_USER),
@@ -71,6 +73,7 @@ export class LocalUsersEffects {
       this.localUserService.deleteUser(action.payload).pipe(
         // If successful, dispatch success action with result
         map((deleteUserResult: ModifiedLocalUserSuccessPayloadModel) => new DeleteLocalUserSuccess(deleteUserResult)),
+        catchError(() => of(new CUDLocalUserFailed()))
       )
     )
   );

@@ -22,6 +22,13 @@ export interface LocalUsersState {
   userCreated?: LocalUser;
   userUpdated?: LocalUser;
   userDeleted?: LocalUser;
+  /**
+   * To indicate that an error occur when Creating, Updating or Deleting
+   *
+   * @type {boolean}
+   * @memberof LocalUsersState
+   */
+  userCUDFailed?: boolean;
 }
 
 export const initialLocalUsersState: LocalUsersState = {
@@ -41,6 +48,7 @@ export function localUserReducer(
       return {
         ...state,
         loadingCUD: true,
+        userCUDFailed: false
       };
     }
 
@@ -56,7 +64,7 @@ export function localUserReducer(
     case LocalUserActions.READ_LOCAL_USERS: {
       return {
         ...state,
-        loadingReading: true,
+        loadingReading: true
       };
     }
 
@@ -71,7 +79,8 @@ export function localUserReducer(
     case LocalUserActions.UPDATE_LOCAL_USER: {
       return {
         ...state,
-        loadingCUD: true
+        loadingCUD: true,
+        userCUDFailed: false
       };
     }
 
@@ -88,7 +97,8 @@ export function localUserReducer(
     case LocalUserActions.DELETE_LOCAL_USER: {
       return {
         ...state,
-        loadingCUD: true
+        loadingCUD: true,
+        userCUDFailed: false
       };
     }
 
@@ -99,6 +109,14 @@ export function localUserReducer(
         loadingCUD: false,
         users: payload.users,
         userDeleted: payload.modifiedUser
+      };
+    }
+
+    case LocalUserActions.CUD_LOCAL_USER_FAILED: {
+      return {
+        ...state,
+        loadingCUD: false,
+        userCUDFailed: true
       };
     }
 

@@ -1,6 +1,7 @@
 import { ApiUsersState, apiUsersReducer, initialApiUsersState } from './api-users/reducers';
 import { ActionReducerMap, createSelector } from '@ngrx/store';
 import { LocalUsersState, localUserReducer } from './local-users/reducers';
+import { filter } from 'rxjs/operators';
 
 
 export interface AppState {
@@ -67,4 +68,9 @@ export const selectLocalUserUpdated = createSelector(
 export const selectLocalUserDeleted = createSelector(
   selectLocalUsersFeature,
   (state: LocalUsersState) => state.userDeleted
+);
+
+export const selectLocalUserCUDFailed = createSelector(
+  selectLocalUsersFeature,
+  (state: LocalUsersState) => state.userCUDFailed
 );

@@ -9,7 +9,14 @@ import { LocalUser } from '../shared/models/local-user.model';
 
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AppState, selectLocalUsers, selectLocalUsersLoadingReading, selectLocalUserDeleted, selectLocalUserUpdated } from '../../store';
+import {
+  AppState,
+  selectLocalUserCUDFailed,
+  selectLocalUserDeleted,
+  selectLocalUserUpdated,
+  selectLocalUsers,
+  selectLocalUsersLoadingReading
+} from '../../store';
 import { ReadLocalUsers } from '../../store/local-users/actions';
 import { filter } from 'rxjs/operators';
 
@@ -117,6 +124,18 @@ export class LocalUsersComponent implements OnInit {
         // Show a snack bar to indicate the operation
         this.snackBar.open('User Updated Successfully', 'GOT IT!', {
           duration: 2000,
+        });
+      });
+
+    // Detect when a CUD error occur and display a snackbar
+    this.store.pipe(
+      select(selectLocalUserCUDFailed),
+      // Only when the error is true
+      filter((hasError: boolean) => hasError)
+    )
+      .subscribe(() => {
+        this.snackBar.open('Connection Error', 'OK', {
+          duration: 10000
         });
       });
   }
