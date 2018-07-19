@@ -169,14 +169,4 @@ export class LocalUserService {
       // Filter only the email
       .some((userEmail) => userEmail === emailToCheck);
   }
-
-  /**
-   * What to do when a connection error happen
-   *
-   * @param err The error triggered
-   */
-  private handleConnectionError(err: any) {
-    /* this.loading.error(err);
-    this.loadingDone(); */
-  }
 }

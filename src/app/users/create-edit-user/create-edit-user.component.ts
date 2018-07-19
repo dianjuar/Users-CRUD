@@ -12,7 +12,6 @@ import {
 import { MatDialogRef } from '@angular/material/dialog';
 
 import { MatSnackBar, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
-import { switchMap } from 'rxjs/operators';
 
 import { LocalUser } from '../shared/models/local-user.model';
 import { LocalUserService } from '../shared/local-user.service';
@@ -119,8 +118,8 @@ export class CreateEditUserComponent implements OnInit {
   ngOnInit() {
     this.myForm = this.fb.group({
       /**
-     * Control the emails errors
-     */
+       * Control the emails errors
+       */
       email: [
         '',
         [Validators.required, Validators.email, this.validateEmail.bind(this)],
@@ -193,28 +192,6 @@ export class CreateEditUserComponent implements OnInit {
    */
   private updateUser() {
     this.store.dispatch( new UpdateLocalUser(this.user));
-    /* this.localUserService.updateUser(this.user).pipe(
-      // Close the modal on success
-      switchMap(() => this.closeModal()))
-      // When the modal is closed....
-      .subscribe(
-        // next
-        () => {
-          // Show a snack bar to indicate the operation
-          this.snackBar.open('User Updated Successfully', 'GOT IT!', {
-            duration: 2000,
-          });
-        },
-        // error
-        (err) => {
-          console.log('error', err);
-
-          // Indicate the error
-          const snackRef = this.snackBar.open('Connection Error', null, {
-            duration: 10000
-          });
-        },
-      );*/
   }
 
   /**
